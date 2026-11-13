@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KI-Werkstatt Polizei NRW — Konzeptvisualisierung</title>
+<style>
+  :root{
+    --bg-dark:#162A45;
+    --bg-card:#163559;
+    --bg-card-hover:#1B4069;
+    --accent:#E8E226;
+    --accent-secondary:#FFE600;
+    --text-title:#C9E0EE;
+    --text-body:#AFC8DB;
+    --text-muted:#96AEC4;
+    --blue-mid:#0061A7;
+    --blue-dynamic:#009ED4;
+    --blue-light:#66C3E6;
+    --line:rgba(201,224,238,0.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *,*::before,*::after{transition:none !important;animation:none !important;}
+  }
+  body{
+    background:var(--bg-dark);
+    color:var(--text-body);
+    font-family:Arial, "Helvetica Neue", Helvetica, sans-serif;
+    font-size:16px;
+    line-height:1.5;
+  }
+  a{color:var(--blue-light);text-decoration:none;}
+  a:focus-visible, button:focus-visible, input:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(22,42,69,0.94);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .header-inner{
+    display:flex;align-items:center;gap:18px;
+    height:auto;min-height:68px;padding:8px 0;flex-wrap:wrap;
+  }
+  .wordmark{display:flex;align-items:baseline;gap:10px;white-space:nowrap;}
+  .wordmark .brand{
+    color:var(--text-title);font-weight:bold;font-size:20px;letter-spacing:0.5px;
+  }
+  .wordmark .brand span{color:var(--accent);}
+  .wordmark .org{
+    color:var(--text-muted);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;
+  }
+  nav{display:flex;gap:16px;flex:1;flex-wrap:wrap;}
+  nav a{
+    color:var(--text-body);font-size:14px;padding:6px 2px;
+    border-bottom:2px solid transparent;transition:color .15s, border-color .15s;
+  }
+  nav a:hover{color:var(--text-title);border-bottom-color:var(--blue-dynamic);}
+  .nav-drop{position:relative;}
+  .nav-drop-btn{
+    background:transparent;border:none;border-bottom:2px solid transparent;
+    color:var(--text-body);font-family:inherit;font-size:14px;font-weight:bold;
+    padding:6px 2px;cursor:pointer;min-height:44px;
+  }
+  .nav-drop-btn:hover,.nav-drop-btn[aria-expanded="true"],.nav-drop-btn[aria-current="page"]{
+    color:var(--text-title);border-bottom-color:var(--accent);
+  }
+  .nav-sub{
+    position:absolute;top:calc(100% + 8px);left:0;min-width:240px;z-index:60;
+    background:var(--bg-card);border:1px solid var(--line);border-radius:8px;
+    padding:6px;box-shadow:0 8px 24px rgba(0,0,0,0.35);
+  }
+  .nav-sub a{
+    display:flex;align-items:center;min-height:44px;padding:8px 12px;
+    border-bottom:none;border-radius:6px;font-size:15px;
+  }
+  .nav-sub a:hover{background:var(--bg-card-hover);border-bottom-color:transparent;}
+
+  .profile{position:relative;}
+  .profile-btn{
+    display:flex;align-items:center;gap:10px;
+    background:transparent;border:1px solid var(--line);border-radius:999px;
+    padding:5px 14px 5px 5px;cursor:pointer;
+    color:var(--text-body);font-family:inherit;font-size:13px;
+    transition:border-color .15s, background .15s;
+  }
+  .profile-btn:hover{border-color:var(--blue-light);background:var(--bg-card);}
+  .avatar{
+    width:30px;height:30px;border-radius:50%;
+    background:var(--blue-mid);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:bold;letter-spacing:0.5px;
+  }
+  .profile-tip{
+    position:absolute;right:0;top:calc(100% + 10px);
+    width:264px;background:var(--bg-card);
+    border:1px solid var(--line);border-radius:8px;
+    padding:12px 14px;font-size:13px;line-height:1.45;color:var(--text-body);
+    box-shadow:0 8px 24px rgba(0,0,0,0.35);
+    opacity:0;visibility:hidden;transform:translateY(-4px);
+    transition:opacity .15s, transform .15s, visibility .15s;
+    pointer-events:none;
+  }
+  .profile-tip::before{
+    content:"";position:absolute;top:-5px;right:26px;
+    width:9px;height:9px;background:var(--bg-card);
+    border-left:1px solid var(--line);border-top:1px solid var(--line);
+    transform:rotate(45deg);
+  }
+  .profile:hover .profile-tip, .profile-btn:focus-visible + .profile-tip{
+    opacity:1;visibility:visible;transform:translateY(0);
+  }
+  .profile-tip strong{color:var(--text-title);display:block;margin-bottom:3px;font-size:13px;}
+
+  /* ---------- Strukturprinzipien (Präsentationsebene) ---------- */
+  .pmode-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    background:transparent;border:1px solid var(--line);border-radius:999px;
+    color:var(--text-body);font-family:inherit;font-size:13px;font-weight:bold;
+    padding:7px 14px;cursor:pointer;white-space:nowrap;
+    transition:border-color .15s, color .15s, background .15s;
+  }
+  .pmode-btn:hover{border-color:var(--blue-light);color:var(--text-title);}
+  .pmode-btn .bulb{width:15px;height:15px;stroke:currentColor;flex-shrink:0;}
+  body.pmode .pmode-btn{
+    background:var(--accent);border-color:var(--accent);color:var(--bg-dark);
+  }
+
+  .prinzip{position:relative;}
+  .p-wrap{border-radius:10px;}
+  .p-mark{
+    display:none;
+    position:absolute;z-index:30;
+    top:-11px;left:-11px;
+    width:22px;height:22px;border-radius:50%;
+    background:var(--accent);color:var(--bg-dark);
+    font-size:12px;font-weight:bold;line-height:22px;text-align:center;
+    border:2px solid var(--bg-dark);
+    box-shadow:0 0 0 1px var(--accent), 0 3px 10px rgba(0,0,0,0.55);
+    cursor:help;
+  }
+  /* Markierung innen, wo der Rand des Fensters oder ein Beschnitt im Weg ist */
+  .p-mark[data-pos="inside"]{top:10px;left:10px;}
+  .p-mark[data-pos="right"]{top:-11px;left:auto;right:-11px;}
+  body.pmode .p-mark{display:block;}
+  body.pmode .prinzip{
+    outline:1px dashed rgba(232,226,38,0.55);
+    outline-offset:5px;border-radius:4px;
+  }
+  body.pmode .prinzip:hover{outline-color:var(--accent);}
+
+  .p-tip{
+    position:absolute;z-index:20;
+    top:calc(100% + 12px);left:0;
+    width:330px;max-width:88vw;
+    background:var(--bg-card);border:1px solid var(--accent);border-radius:8px;
+    padding:14px 16px;
+    box-shadow:0 12px 32px rgba(0,0,0,0.5);
+    opacity:0;visibility:hidden;transform:translateY(-4px);
+    transition:opacity .15s, transform .15s, visibility .15s;
+    pointer-events:none;text-align:left;
+    white-space:normal;overflow-wrap:anywhere;
+  }
+  .p-tip[data-align="right"]{left:auto;right:0;}
+  .p-tip::before{
+    content:"";position:absolute;top:-5px;left:24px;
+    width:9px;height:9px;background:var(--bg-card);
+    border-left:1px solid var(--accent);border-top:1px solid var(--accent);
+    transform:rotate(45deg);
+  }
+  .p-tip[data-align="right"]::before{left:auto;right:24px;}
+  .p-tip .p-kicker{
+    display:block;font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;
+    font-weight:bold;color:var(--accent);margin-bottom:5px;
+  }
+  .p-tip .p-title{
+    display:block;color:var(--text-title);font-size:14.5px;font-weight:bold;
+    line-height:1.35;margin-bottom:7px;
+  }
+  .p-tip .p-text{
+    display:block;font-size:13px;line-height:1.5;color:var(--text-body);margin-bottom:10px;
+  }
+  .p-tip .p-src{
+    display:block;font-size:11.5px;line-height:1.45;color:var(--text-muted);
+    padding-top:9px;border-top:1px solid var(--line);
+  }
+  .p-tip .p-src b{color:var(--text-body);font-weight:bold;}
+  body.pmode .prinzip:hover > .p-tip,
+  body.pmode .prinzip:focus-within > .p-tip,
+  body.pmode .p-mark:focus + .p-tip{
+    opacity:1;visibility:visible;transform:translateY(0);
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{padding:64px 0 46px;}
+  .eyebrow{
+    font-size:12px;letter-spacing:2.5px;text-transform:uppercase;
+    color:var(--blue-light);margin-bottom:14px;
+  }
+  h1{
+    color:var(--text-title);font-size:40px;line-height:1.18;font-weight:bold;
+    max-width:760px;margin-bottom:14px;
+  }
+  .hero p.sub{max-width:640px;font-size:17px;margin-bottom:34px;}
+
+  .search{
+    display:flex;align-items:center;gap:12px;
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    padding:6px 8px 6px 20px;max-width:760px;
+    transition:border-color .15s;
+  }
+  .search:focus-within{border-color:var(--accent);}
+  .search svg{flex-shrink:0;stroke:var(--text-muted);}
+  .search input{
+    flex:1;background:transparent;border:none;outline:none;
+    color:var(--text-title);font-family:inherit;font-size:16px;padding:12px 0;
+  }
+  .search input::placeholder{color:var(--text-muted);}
+  .search button{
+    background:var(--blue-mid);color:#fff;border:none;border-radius:7px;
+    font-family:inherit;font-size:15px;font-weight:bold;
+    padding:11px 24px;cursor:pointer;transition:background .15s;
+  }
+  .search button:hover{background:#00548C;}
+
+  /* Einstiegspfade */
+  .paths{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
+    margin-top:38px;
+  }
+  .path{
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    padding:22px 22px 20px;cursor:pointer;position:relative;
+    transition:background .15s, transform .15s, border-color .15s;
+  }
+  .path:hover{background:var(--bg-card-hover);transform:translateY(-3px);border-color:rgba(201,224,238,0.3);}
+  .path::before{
+    content:"";position:absolute;left:0;top:16px;bottom:16px;width:3px;
+    background:var(--blue-dynamic);border-radius:0 3px 3px 0;
+    transition:background .15s;
+  }
+  .path:hover::before{background:var(--accent);}
+  .path h3{color:var(--text-title);font-size:17px;margin-bottom:7px;}
+  .path p{font-size:14px;color:var(--text-body);}
+  .path .go{
+    display:inline-block;margin-top:14px;font-size:13px;color:var(--blue-light);font-weight:bold;
+  }
+
+  /* ---------- Sections ---------- */
+  section{padding:52px 0;}
+  .section-head{
+    display:flex;align-items:baseline;justify-content:space-between;
+    margin-bottom:24px;gap:20px;flex-wrap:wrap;
+  }
+  h2{color:var(--text-title);font-size:26px;font-weight:bold;}
+  .section-head .hint{font-size:14px;color:var(--text-muted);}
+
+  /* Filterstatus und Leerzustand */
+  .filter-status{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    margin:0 0 18px;
+  }
+  .fcount{font-size:13.5px;color:var(--text-muted);}
+  .fcount strong{color:var(--text-title);}
+  .freset{
+    background:transparent;border:1px solid var(--line);border-radius:999px;
+    color:var(--text-body);font-family:inherit;font-size:13px;
+    padding:6px 15px;cursor:pointer;
+    transition:border-color .15s, color .15s;
+  }
+  .freset:hover{border-color:var(--blue-light);color:var(--text-title);}
+  .tile[hidden]{display:none;}
+  .empty{
+    background:var(--bg-card);border:1px dashed rgba(201,224,238,0.3);border-radius:10px;
+    padding:36px 32px;text-align:center;
+  }
+  .empty h3{color:var(--text-title);font-size:17px;margin-bottom:8px;}
+  .empty p{font-size:14px;max-width:60ch;margin:0 auto 18px;}
+  .lvl.impulstag{background:var(--accent);color:var(--bg-dark);}
+
+  /* Impulse aus der Praxis */
+  .impulse-intro{
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    padding:20px 24px;margin-bottom:24px;
+    border-left:3px solid var(--accent);
+  }
+  .impulse-intro p{font-size:14.5px;max-width:82ch;}
+  .impulse-intro strong{color:var(--text-title);}
+  .impulse-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .imp{
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    padding:20px;display:flex;flex-direction:column;gap:14px;
+    transition:background .15s, border-color .15s, transform .15s;
+  }
+  .imp:hover{background:var(--bg-card-hover);border-color:rgba(201,224,238,0.3);transform:translateY(-2px);}
+  .imp-fmt{
+    display:inline-flex;align-items:center;gap:7px;align-self:flex-start;
+    font-size:11px;letter-spacing:1.2px;text-transform:uppercase;font-weight:bold;
+    color:var(--bg-dark);background:var(--accent);
+    border-radius:4px;padding:4px 9px;
+  }
+  .imp-fmt.podcast{background:var(--blue-light);}
+  .imp-fmt.tutorial{background:var(--blue-dynamic);}
+  .imp h3{color:var(--text-title);font-size:16px;font-weight:bold;line-height:1.35;}
+  .imp p{font-size:14px;}
+  .imp-person{
+    display:flex;align-items:center;gap:11px;
+    margin-top:auto;padding-top:14px;border-top:1px solid var(--line);
+  }
+  .imp-person .c-av{width:34px;height:34px;font-size:12px;flex-shrink:0;}
+  .imp-name{color:var(--text-title);font-size:13.5px;font-weight:bold;line-height:1.3;}
+  .imp-role{
+    display:flex;align-items:center;gap:5px;
+    font-size:12px;color:var(--text-muted);
+  }
+  .imp-role svg{stroke:var(--accent);flex-shrink:0;}
+  .impulse-cta{
+    display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    padding:22px 24px;margin-top:20px;
+  }
+  .impulse-cta h3{color:var(--text-title);font-size:17px;margin-bottom:5px;}
+  .impulse-cta p{font-size:14px;max-width:72ch;}
+
+  /* Filterleiste */
+  .filters{
+    display:flex;flex-direction:column;align-items:stretch;gap:0;
+    padding:8px 12px 16px;background:var(--bg-card);
+    border:1px solid var(--line);border-radius:10px;margin-bottom:28px;
+  }
+  .filter-lead{
+    margin:14px 8px 4px;max-width:70ch;font-size:15px;color:var(--text-body);
+  }
+  .filters .filter-status{margin:0 8px 8px;}
+  .fgroup{
+    display:flex;align-items:center;gap:10px 12px;flex-wrap:wrap;
+    padding:12px 8px;border-top:1px solid var(--line);
+  }
+  .fgroup .flabel{
+    flex:0 0 8.5rem;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;
+    font-weight:bold;color:var(--text-title);
+  }
+  .chip{
+    background:transparent;border:1px solid #8FB0C6;border-radius:999px;
+    color:var(--text-body);font-family:inherit;font-size:15px;
+    min-height:44px;padding:8px 16px;cursor:pointer;
+    transition:all .12s;
+  }
+  .chip:hover{border-color:var(--blue-light);color:var(--text-title);}
+  .chip.active{
+    background:var(--blue-mid);border-color:var(--blue-mid);color:#fff;font-weight:bold;
+  }
+
+  /* Inhaltskacheln */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .tile{
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    overflow:hidden;display:flex;flex-direction:column;position:relative;
+    transition:transform .15s, border-color .15s;
+  }
+  .stift{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    width:44px;height:44px;border-radius:8px;border:1px solid var(--line);
+    background:var(--bg-card);color:var(--blue-light);cursor:pointer;padding:0;
+  }
+  .tile > .stift{position:absolute;top:8px;right:8px;z-index:2;}
+  .stift:hover{border-color:var(--accent);background:var(--bg-card-hover);}
+  .btn-line.stift{width:auto;height:auto;min-height:44px;padding:8px 16px;}
+  .titelzeile{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+  .titelzeile h1{flex:1;}
+  .tile:hover{transform:translateY(-3px);border-color:rgba(201,224,238,0.3);}
+  .thumb{
+    height:120px;position:relative;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .thumb svg{opacity:0.9;}
+  .t1 .thumb{background:linear-gradient(135deg,#0F3D66,#0061A7);}
+  .t2 .thumb{background:linear-gradient(135deg,#123253,#00688F);}
+  .t3 .thumb{background:linear-gradient(135deg,#1A2E56,#3E5B9B);}
+  .t4 .thumb{background:linear-gradient(135deg,#0D4A63,#009ED4);}
+  .t5 .thumb{background:linear-gradient(135deg,#122B4B,#37699C);}
+  .t6 .thumb{background:linear-gradient(135deg,#0F3B5A,#2E86AB);}
+  .fmt{
+    position:absolute;left:12px;bottom:10px;
+    display:flex;align-items:center;gap:6px;
+    background:rgba(22,42,69,0.8);border-radius:6px;
+    padding:4px 10px;font-size:12px;color:var(--text-title);
+  }
+  .tile-body{padding:16px 18px 14px;display:flex;flex-direction:column;flex:1;}
+  .badges{display:flex;gap:8px;margin-bottom:10px;align-items:center;}
+  .lvl{
+    font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;
+    padding:3px 10px;border-radius:4px;color:#0E1F35;
+  }
+  .lvl.basis{background:var(--blue-light);}
+  .lvl.aufbau{background:var(--blue-dynamic);}
+  .lvl.spezial{background:var(--blue-mid);color:#fff;}
+  .lvl.profi{background:var(--bg-dark);color:var(--blue-light);box-shadow:inset 0 0 0 1px var(--blue-light);}
+  .dur{font-size:12px;color:var(--text-muted);}
+  .tile h3{color:var(--text-title);font-size:16px;line-height:1.35;margin-bottom:8px;}
+  .tile p{font-size:13.5px;color:var(--text-body);flex:1;}
+  .tile-foot{
+    display:flex;align-items:center;gap:16px;margin-top:14px;
+    padding-top:12px;border-top:1px solid var(--line);
+    font-size:13px;color:var(--text-muted);
+  }
+  .likebtn{
+    display:flex;align-items:center;gap:6px;
+    background:transparent;border:none;cursor:pointer;
+    color:var(--text-muted);font-family:inherit;font-size:13px;
+    padding:2px 4px;transition:color .12s;
+  }
+  .likebtn:hover{color:var(--blue-light);}
+  .likebtn.liked{color:var(--blue-light);font-weight:bold;}
+  .meta-ic{display:flex;align-items:center;gap:6px;}
+
+  /* Detailkarte mit Kommentaren */
+  .detail{
+    margin-top:26px;
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    display:grid;grid-template-columns:340px 1fr;overflow:hidden;
+  }
+  .detail-left{
+    background:linear-gradient(150deg,#0D4A63,#009ED4);
+    padding:26px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;
+    min-height:260px;position:relative;
+  }
+  .playbig{
+    width:56px;height:56px;border-radius:50%;
+    background:rgba(22,42,69,0.75);
+    display:flex;align-items:center;justify-content:center;
+    position:absolute;top:calc(50% - 46px);left:calc(50% - 28px);
+  }
+  .detail-left .badges{margin:0;}
+  .detail-left h3{color:#fff;font-size:19px;line-height:1.3;}
+  .detail-right{padding:24px 28px;}
+  .detail-right .dhead{
+    display:flex;align-items:baseline;justify-content:space-between;
+    margin-bottom:16px;gap:16px;flex-wrap:wrap;
+  }
+  .detail-right .dhead h2,.detail-right .dhead h4{color:var(--text-title);font-size:18px;letter-spacing:0.3px;margin:0;}
+  .detail-right .dhead span{font-size:13px;color:var(--text-muted);}
+  .comment{
+    display:flex;gap:12px;padding:13px 0;border-top:1px solid var(--line);
+  }
+  .comment:first-of-type{border-top:none;padding-top:0;}
+  .c-av{
+    width:34px;height:34px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:bold;color:#fff;
+  }
+  .c-av.a{background:#3E5B9B;} .c-av.b{background:#00688F;} .c-av.c{background:#37699C;}
+  .c-body{flex:1;}
+  .c-name{font-size:13px;color:var(--text-title);font-weight:bold;margin-bottom:2px;}
+  .c-name span{color:var(--text-muted);font-weight:normal;margin-left:8px;font-size:12px;}
+  .c-text{font-size:14px;color:var(--text-body);}
+  .c-actions{margin-top:6px;font-size:12px;color:var(--text-muted);display:flex;gap:14px;}
+  .c-reply{margin-left:46px;}
+
+  /* FAQ */
+  .faq-seite > p{max-width:68ch;margin-bottom:22px;}
+  .faq-list{display:flex;flex-direction:column;gap:12px;}
+  .faq-item{
+    position:relative;
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    overflow:hidden;
+  }
+  .faq-item.open{border-color:rgba(201,224,238,.4);}
+  .faq-item.open::before{
+    content:"";position:absolute;left:0;top:16px;bottom:16px;width:3px;
+    background:var(--accent);border-radius:0 3px 3px 0;
+  }
+  .faq-q{
+    width:100%;display:flex;align-items:center;justify-content:space-between;gap:18px;
+    background:transparent;border:none;cursor:pointer;
+    padding:18px 20px;text-align:left;
+    color:var(--text-title);font-family:inherit;font-size:17px;font-weight:bold;line-height:1.35;
+  }
+  .faq-q:hover{background:var(--bg-card-hover);}
+  .faq-q .plus{
+    flex-shrink:0;width:32px;height:32px;border-radius:50%;
+    border:1px solid var(--line);color:var(--blue-light);
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .18s, border-color .18s, background .18s;
+  }
+  .faq-q .plus svg{stroke:currentColor;}
+  .faq-item.open .plus{transform:rotate(180deg);border-color:var(--blue-light);background:rgba(0,104,143,.25);}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .22s ease;}
+  .faq-item.open .faq-a{max-height:none;}
+  .faq-a > p{padding:0 20px 8px 20px;font-size:15.5px;max-width:72ch;color:var(--text-body);}
+  .faq-fuss{
+    display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;
+    margin:8px 20px 0;padding:12px 0 16px;border-top:1px solid var(--line);
+  }
+  .faq-fuss .textbtn{margin-left:auto;}
+  .faq-lage{
+    font-size:12.5px;font-weight:bold;line-height:1.3;
+    color:var(--bg-dark);background:var(--accent);border-radius:999px;padding:4px 10px;
+  }
+  .faq-lage.offen{background:var(--blue-dynamic);color:#062033;}
+
+  /* Community */
+  .community-wrap{
+    display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start;
+  }
+  .thread{
+    display:flex;gap:16px;align-items:flex-start;
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    padding:18px 20px;margin-bottom:14px;cursor:pointer;
+    transition:background .15s, border-color .15s;
+  }
+  .thread:hover{background:var(--bg-card-hover);border-color:rgba(201,224,238,0.3);}
+  .thread .c-av{margin-top:2px;}
+  .thread h3{color:var(--text-title);font-size:15.5px;font-weight:bold;margin-bottom:5px;line-height:1.35;}
+  .thread .t-meta{font-size:13px;color:var(--text-muted);display:flex;gap:14px;flex-wrap:wrap;}
+  .expert{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:11.5px;font-weight:bold;letter-spacing:0.3px;
+    color:var(--accent);
+  }
+  .expert svg{stroke:var(--accent);}
+  .community-side{
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    padding:22px;
+  }
+  .community-side h3{color:var(--text-title);font-size:16px;margin-bottom:8px;}
+  .community-side p{font-size:14px;margin-bottom:16px;}
+  .btn-line{
+    display:inline-block;border:1px solid var(--blue-light);border-radius:7px;
+    color:var(--blue-light);font-size:14px;font-weight:bold;
+    padding:9px 20px;transition:all .15s;
+    background:transparent;font-family:inherit;cursor:pointer;
+  }
+  .btn-line:hover{background:var(--blue-light);color:var(--bg-dark);}
+
+  /* Live-Session */
+  .live{
+    display:grid;grid-template-columns:auto 1fr auto;gap:26px;align-items:center;
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    padding:26px 30px;position:relative;overflow:hidden;
+  }
+  .live::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent);
+  }
+  .live-date{
+    text-align:center;min-width:86px;
+    border-right:1px solid var(--line);padding-right:26px;
+  }
+  .live-date .d{font-size:34px;font-weight:bold;color:var(--text-title);line-height:1;}
+  .live-date .m{font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-top:4px;}
+  .live-info .tag{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:11.5px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--accent);margin-bottom:8px;
+  }
+  .live-info .dot{
+    width:8px;height:8px;border-radius:50%;background:var(--accent);
+    animation:pulse 1.8s infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+  .live-info h3{color:var(--text-title);font-size:18px;margin-bottom:6px;}
+  .live-info p{font-size:14px;}
+  .btn-solid{
+    background:var(--blue-mid);color:#fff;border:none;border-radius:7px;
+    font-family:inherit;font-size:15px;font-weight:bold;
+    padding:12px 26px;cursor:pointer;white-space:nowrap;transition:background .15s;
+  }
+  .btn-solid:hover{background:#00548C;}
+
+  /* Footer */
+  footer{
+    border-top:1px solid var(--line);margin-top:30px;
+    padding:26px 0 34px;
+  }
+  .footer-inner{
+    display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+    font-size:12.5px;color:var(--text-muted);
+  }
+  .footer-inner .disclaimer{font-style:italic;}
+
+  .hub{padding-bottom:64px;}
+  .start-hero{padding-bottom:20px;}
+  .start-bereich{border-top:1px solid var(--line);}
+  .start-mehr{display:flex;justify-content:flex-end;margin-top:20px;}
+  #start-filter-gruppen,.filter-gruppen{display:contents;}
+  #start-community-liste .thread{cursor:pointer;}
+  button.imp{display:flex;flex-direction:column;width:100%;text-align:left;font-family:inherit;color:inherit;cursor:pointer;}
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  .search input{min-width:0;text-overflow:ellipsis;}
+  @media (max-width:640px){
+    .search{padding-left:14px;gap:8px;}
+    .search button{padding:11px 14px;}
+  }
+  .hub-split{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:28px;}
+  .lauf-hub{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:0 0 22px;}
+  .lauf-hub .hub-tile{width:100%;min-height:168px;}
+  .hub-zone{padding:18px;border:1px solid var(--line);border-radius:12px;}
+  section.hub-zone{padding:18px;}
+  .hub-zone h2{font-size:22px;margin:0 0 12px;}
+  .hub-zone-meine{border-top:4px solid var(--blue-light);}
+  .hub-zone-allgemein{border-top:4px solid var(--accent);}
+  .hub-zone .hub-tile{width:100%;min-height:148px;}
+  .hub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px;}
+  .inhaltsbereich{margin:8px 0 32px;padding:22px 22px 26px;border:1px solid var(--line);border-radius:12px;}
+  section.inhaltsbereich{padding:22px 22px 26px;}
+  .bereich-meine{border-top:4px solid var(--blue-light);}
+  .bereich-allgemein{border-top:4px solid var(--accent);}
+  .bereich-impuls{border-top:4px solid var(--blue-dynamic);}
+  .bereich-live{border-top:4px solid var(--blue-mid);}
+  .bereich-community{border-top:4px solid var(--text-muted);}
+  h2[id],#kommentar-bereich{scroll-margin-top:88px;}
+  .wegweiser{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 18px;}
+  .wegweiser button{
+    min-height:44px;padding:8px 14px;border-radius:999px;
+    border:1px solid var(--line);background:var(--bg-card);color:var(--text-title);
+    font:inherit;font-size:14px;font-weight:bold;cursor:pointer;
+  }
+  .wegweiser button:hover,.wegweiser button[aria-current="page"]{border-color:var(--accent);}
+  .krumen{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px;font-size:14px;}
+  .krumen button{background:none;border:none;color:var(--blue-light);font:inherit;font-weight:bold;cursor:pointer;padding:4px 0;min-height:44px;}
+  .krumen button:hover{text-decoration:underline;}
+  .krumen [aria-current="page"]{color:var(--text-title);font-weight:bold;}
+  .krumen-sep{color:var(--text-muted);}
+  .kommentar-link{margin-left:auto;min-height:44px;padding:8px 0;}
+  .hub-tile{
+    text-align:left;background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    padding:22px 22px 18px;min-height:168px;cursor:pointer;color:inherit;font-family:inherit;
+    display:flex;flex-direction:column;align-items:flex-start;
+    transition:background .15s, transform .15s, border-color .15s;
+  }
+  .hub-tile:hover{background:var(--bg-card-hover);transform:translateY(-3px);border-color:rgba(201,224,238,0.3);}
+  .hub-tile .hub-titel{color:var(--text-title);font-size:20px;font-weight:bold;line-height:1.3;margin-bottom:8px;}
+  .hub-tile .hub-text{font-size:15px;color:var(--text-body);flex:1;}
+  .hub-tile .go{display:inline-block;margin-top:16px;font-size:14px;color:var(--blue-light);font-weight:bold;}
+  .zahl-badge{
+    display:inline-flex;align-items:center;justify-content:center;min-width:48px;min-height:48px;
+    padding:4px 12px;border-radius:8px;background:var(--blue-mid);color:#fff;
+    font-size:28px;font-weight:bold;line-height:1;margin-bottom:12px;
+  }
+  .anlegen{
+    background:var(--bg-card);border:1px solid var(--line);border-top:4px solid var(--accent);
+    border-radius:12px;padding:28px 28px 18px;margin:8px 0 28px;
+  }
+  .anlegen h2{color:var(--text-title);font-size:28px;margin:0 0 8px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .anlegen p{font-size:17px;max-width:66ch;}
+  .view > .backlink{margin-top:28px;}
+
+  @media (max-width:980px){
+    .grid,.paths,.hub-grid,.hub-split{grid-template-columns:1fr 1fr;}
+    .detail{grid-template-columns:1fr;}
+    .community-wrap{grid-template-columns:1fr;}
+    nav{display:none;}
+  }
+  @media (max-width:640px){
+    .grid,.paths,.impulse-grid,.hub-grid,.hub-split,.lauf-hub{grid-template-columns:1fr;}
+    .fgroup .flabel{flex-basis:100%;}
+    .p-tip{width:min(330px,88vw);left:0;right:auto;}
+    .p-tip[data-align="right"]{left:0;right:auto;}
+    .pmode-btn{display:none;}
+    h1{font-size:30px;}
+    .live{grid-template-columns:1fr;}
+    .live-date{border-right:none;border-bottom:1px solid var(--line);padding:0 0 14px;}
+  }
+
+  [hidden]{display:none !important;}
+  .skip{position:absolute;left:-999px;top:0;}
+  .skip:focus{left:16px;top:12px;z-index:80;background:var(--accent);color:var(--bg-dark);padding:8px 12px;font-weight:bold;}
+  .profile-label{display:flex;flex-direction:column;align-items:flex-start;line-height:1.15;text-align:left;}
+  .profile-role{font-size:11px;color:var(--text-muted);font-weight:normal;}
+  .profile-menu{
+    position:absolute;right:0;top:calc(100% + 10px);width:280px;
+    background:var(--bg-card);border:1px solid var(--line);border-radius:8px;
+    padding:8px;box-shadow:0 8px 24px rgba(0,0,0,0.35);z-index:40;
+  }
+  .profile-menu button{
+    display:block;width:100%;text-align:left;background:transparent;border:none;
+    color:var(--text-body);font-family:inherit;font-size:14px;padding:8px 10px;border-radius:6px;cursor:pointer;
+  }
+  .profile-menu button:hover,.profile-menu button.active{background:var(--bg-card-hover);color:var(--text-title);}
+  .profile-menu .menu-label{display:block;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-muted);padding:8px 10px 4px;}
+  body.sso nav,body.sso .profile,body.sso .pmode-btn,body.sso .kopf-suche{visibility:hidden;}
+  .hello{color:var(--text-title);font-size:15px;margin-bottom:8px;}
+  .entry-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px;}
+  .entry-card{
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    padding:22px;position:relative;
+  }
+  .entry-card.open{grid-column:1 / -1;}
+  .entry-kicker{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;font-weight:bold;color:var(--accent);margin-bottom:8px;}
+  .entry-card h3{color:var(--text-title);font-size:17px;margin-bottom:8px;}
+  .entry-card p{font-size:14px;margin-bottom:14px;}
+  .entry-actions{display:flex;flex-wrap:wrap;gap:10px;}
+  .orient-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px;}
+  .orient-steps article{background:var(--bg-dark);border-radius:8px;padding:14px;}
+  .orient-steps h4{color:var(--text-title);font-size:15px;margin-bottom:6px;}
+  .orient-steps p{margin:0;font-size:14px;}
+  #pfadhinweis,#suchpanel{margin:0 0 18px;}
+  #suchpanel{background:var(--bg-card);border:1px solid var(--line);border-radius:10px;padding:8px 14px 14px;}
+  .tile,.imp,.thread{cursor:pointer;}
+  .view h1{color:var(--text-title);font-size:32px;line-height:1.2;margin:6px 0 12px;}
+  .view h2{margin:26px 0 12px;}
+  .backlink{background:none;border:none;color:var(--blue-light);font:inherit;font-weight:bold;font-size:14px;cursor:pointer;padding:18px 0 8px;}
+  .ergebnis-zeile{font-size:17px;color:var(--text-title);margin-bottom:8px;}
+  .meta-line{font-size:13.5px;color:var(--text-muted);margin-bottom:6px;}
+  .stage,.praxis,.fehler,.form-card,.ausbau-box,.banner{
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:16px 0;
+  }
+  .banner{border-left:3px solid var(--accent);}
+  .video-fake{
+    min-height:220px;border-radius:8px;background:linear-gradient(150deg,#0D4A63,#009ED4);
+    position:relative;display:flex;align-items:flex-end;padding:16px;
+  }
+  .video-fake .playbig{position:absolute;top:50%;left:50%;transform:translate(-50%,-70%);}
+  .video-caption{color:#fff;font-weight:bold;}
+  .video-frame{width:100%;height:320px;border:0;border-radius:10px;background:#0d4a63;display:block;}
+  .stage-note{font-size:14px;margin-top:12px;}
+  .transcript h3,.praxis h3,.fehler h3,.h5p h3{color:var(--text-title);font-size:16px;margin-bottom:8px;}
+  .steps{list-style:none;display:grid;gap:12px;margin:16px 0;}
+  .steps li{background:var(--bg-card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;}
+  .steps h3{color:var(--text-title);font-size:16px;margin-bottom:6px;}
+  .praxis dl,.gloss{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;}
+  .praxis dt,.gloss dt{color:var(--text-title);font-weight:bold;font-size:13px;}
+  .praxis dd,.gloss dd{font-size:14px;}
+  .gloss{margin-top:12px;}
+  .fehler{border-left:3px solid var(--accent);}
+  .checkline{display:flex;gap:10px;align-items:flex-start;margin:14px 0;font-size:15px;}
+  .button-row{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 20px;}
+  .comment-form{margin-top:12px;}
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+  .field span,.field legend{font-size:13px;color:var(--text-title);font-weight:bold;}
+  .field input,.field textarea,.field select,fieldset.field{
+    background:var(--bg-dark);border:1px solid var(--line);border-radius:8px;color:var(--text-title);
+    font:inherit;font-size:15px;padding:10px 12px;
+  }
+  fieldset.field{padding:12px;}
+  .hint{font-weight:normal;color:var(--text-muted);font-size:13px;}
+  .niveaus{border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+  .niveaus legend{padding:0 6px;color:var(--text-title);font-weight:bold;}
+  .niveaus label{display:flex;flex-direction:column;gap:6px;background:var(--bg-dark);border:1px solid var(--line);border-radius:8px;padding:12px;cursor:pointer;}
+  .niveaus label:has(input:checked){border-color:var(--accent);}
+  .niveaus strong{color:var(--text-title);}
+  .niveaus span{font-size:13px;}
+  .niveaus.vier{grid-template-columns:repeat(4,1fr);}
+  .term{background:none;border:none;border-bottom:1px dashed var(--blue-light);color:var(--text-title);font:inherit;cursor:help;padding:0;}
+  .term-pop{
+    position:absolute;z-index:70;width:320px;max-width:88vw;background:var(--bg-card);
+    border:1px solid var(--accent);border-radius:8px;padding:12px 14px;box-shadow:0 12px 32px rgba(0,0,0,.45);
+  }
+  .term-pop strong{display:block;color:var(--text-title);margin-bottom:4px;}
+  .term-pop span{font-size:13.5px;line-height:1.45;}
+  .summary-list{margin:12px 0 18px 18px;}
+  .summary-list li{margin:6px 0;}
+  .facebtns{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+  .facebtn{
+    background:var(--bg-card);border:1px solid var(--line);border-radius:999px;color:var(--text-body);
+    font:inherit;font-size:14px;padding:8px 14px;cursor:pointer;
+  }
+  .facebtn.active,.facebtn:hover{border-color:var(--accent);color:var(--text-title);}
+  .rowlist,.list{margin:8px 0 16px;}
+  .rowitem,.listrow{
+    width:100%;text-align:left;background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    color:var(--text-body);font:inherit;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;
+  }
+  button.rowitem{cursor:pointer;}
+  button.rowitem:hover{border-color:rgba(201,224,238,.35);}
+  .listrow strong,.rowitem strong{color:var(--text-title);}
+  .listrow.head{background:transparent;border:none;color:var(--text-muted);font-size:12px;letter-spacing:1px;text-transform:uppercase;}
+  .st{font-size:11px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:3px 8px;}
+  .st.entwurf{border:1px solid var(--text-muted);color:var(--text-body);}
+  .st.review{background:var(--blue-dynamic);color:#062033;}
+  .st.freigabe{background:var(--blue-mid);color:#fff;}
+  .st.veroeffentlicht{background:var(--accent);color:var(--bg-dark);}
+  .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0 18px;}
+  .kpi div{background:var(--bg-card);border:1px solid var(--line);border-radius:10px;padding:14px;}
+  .kpi strong{display:block;color:var(--text-title);font-size:22px;}
+  .kpi span{font-size:13px;color:var(--text-muted);}
+  .pruef{margin:12px 0 12px 18px;}
+  .pruef .ok{color:var(--text-title);}
+  .pruef .bad{color:var(--accent-secondary);}
+  .ausbau{
+    display:inline-flex;align-items:center;font-size:11px;font-weight:bold;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 8px;
+  }
+  .textbtn{background:none;border:none;color:var(--blue-light);font:inherit;font-size:13px;cursor:pointer;padding:0;}
+  .faq-meta{color:var(--text-muted);font-size:13px;}
+  .modal{position:fixed;inset:0;background:rgba(8,16,28,.72);z-index:80;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .modal-card{width:min(560px,100%);background:var(--bg-card);border:1px solid var(--line);border-radius:10px;padding:22px;}
+  .modal-card h2{color:var(--text-title);font-size:20px;margin-bottom:10px;}
+  .modal-note{color:var(--text-muted);font-size:13.5px;margin-top:10px;}
+  .modal-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+  .toast{
+    position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:90;
+    background:var(--bg-card);border:1px solid var(--accent);color:var(--text-title);
+    border-radius:999px;padding:10px 16px;box-shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  button:disabled{opacity:.45;cursor:not-allowed;}
+  header nav a[aria-current="page"]{color:var(--text-title);border-bottom-color:var(--accent);}
+  @media (max-width:980px){
+    .entry-row,.kpi,.praxis dl,.gloss,.niveaus,.niveaus.vier,.orient-steps{grid-template-columns:1fr 1fr;}
+    nav{display:flex;flex-wrap:wrap;gap:8px 14px;}
+    .header-inner{height:auto;min-height:68px;padding:10px 0;flex-wrap:wrap;}
+  }
+  @media (max-width:640px){
+    .entry-row,.kpi,.praxis dl,.gloss,.niveaus,.niveaus.vier,.orient-steps{grid-template-columns:1fr;}
+    .view h1{font-size:28px;}
+  }
+
+  .kopf-suche{position:relative;flex:0 0 auto;margin:0;}
+  .lupe{
+    width:44px;height:44px;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;
+    background:transparent;border:1px solid var(--line);color:var(--text-title);
+    cursor:pointer;padding:0;
+  }
+  .lupe:hover,.lupe[aria-expanded="true"]{border-color:var(--blue-light);background:var(--bg-card);}
+  .lupe svg{stroke:currentColor;}
+  .kopf-suchfeld{
+    position:absolute;top:calc(100% + 10px);right:0;z-index:60;
+    width:min(520px,86vw);
+    background:var(--bg-card);border:1px solid var(--line);border-radius:10px;
+    padding:10px;box-shadow:0 12px 32px rgba(0,0,0,0.45);
+  }
+  .kopf-suchfeld .search{max-width:none;margin:0;}
+  @media (prefers-reduced-motion: no-preference){
+    .kopf-suchfeld{animation:such-aus .16s ease;}
+  }
+  @keyframes such-aus{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:none;}}
+  .bereich-suche{margin:0 0 22px;max-width:760px;}
+  .such-gruppe{margin:0 0 28px;}
+  .such-gruppe .rowitem{width:100%;}
+  .bereich-titel{color:var(--text-title);font-size:20px;margin:22px 0 14px;}
+  .happen{list-style:none;display:flex;flex-direction:column;gap:10px;margin:0 0 8px;}
+  .happen li{margin:0;}
+  .happen button{
+    width:100%;text-align:left;min-height:52px;display:flex;justify-content:space-between;gap:16px;align-items:center;
+    background:var(--bg-card);border:1px solid #8FB0C6;border-radius:10px;color:var(--text-title);
+    font-family:inherit;font-size:16px;font-weight:bold;padding:12px 16px;cursor:pointer;
+  }
+  .happen button span{color:var(--text-body);font-weight:normal;white-space:nowrap;}
+  .happen button:hover{background:var(--bg-card-hover);}
+  .eigenliste .listrow{margin-bottom:10px;}
+  .profile-menu{width:min(340px,92vw);}
+  .menu-erklaerung{display:block;font-weight:normal;color:var(--text-muted);margin-top:4px;}
+  .imp-fmt,.lvl.impulstag,.st.veroeffentlicht,body.pmode .pmode-btn{color:var(--bg-dark);}
+</style>
+</head>
+<body>
+<a class="skip" href="#inhalt">Zum Inhalt springen</a>
+
+<header>
+  <div class="wrap header-inner">
+    <div class="wordmark prinzip">
+      <span class="p-mark" data-pos="right" tabindex="0" role="button" aria-label="Strukturprinzip 1: Stufenweiser Aufbau statt Vollausbau">1</span><span class="p-tip"><span class="p-kicker">Strukturprinzip 1</span><span class="p-title">Stufenweiser Aufbau statt Vollausbau</span><span class="p-text">Was Sie hier sehen, ist ein Mockup der ersten Ausbaustufe. Diese wird nach dem Aufbau mit Nutzergruppen erprobt, bevor erweitert wird. Erst danach folgen Vollausbau und die geprüfte Erreichbarkeit aus dem Internet.</span><span class="p-src">Feinkonzept 5.4.1 · Meilensteine HF 6.2 M1.3 bis M1.6 · Abhängigkeiten A3 und A4</span></span>
+      <div class="brand">KI<span>-</span>Werkstatt</div>
+      <div class="org">Polizei NRW</div>
+    </div>
+    <nav aria-label="Bereiche">
+      <div class="nav-drop">
+        <button type="button" class="nav-drop-btn" id="nav-inhalte-btn" data-nav-toggle aria-expanded="false" aria-controls="nav-inhalte-sub">Inhalte</button>
+        <div class="nav-sub" id="nav-inhalte-sub" hidden>
+          <a href="#/meine-inhalte" data-nav="meine" data-view="meine">Meine Inhalte</a>
+          <a href="#/lektionen" data-nav="inhalte" data-view="inhalte">Lektionen</a>
+          <a href="#/impulse" data-nav="impulse" data-view="impulse">Impulse</a>
+          <a href="#/live" data-nav="live" data-view="live">Live-Sessions</a>
+          <a href="#/community" data-nav="community" data-view="community">Community</a>
+        </div>
+      </div>
+      <a href="#/faq" data-nav="faq" data-view="faq">FAQ</a>
+    </nav>
+    <div class="kopf-suche">
+      <button type="button" class="lupe" id="lupe" aria-expanded="false" aria-controls="kopf-suchfeld" aria-label="Suche öffnen">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+      </button>
+      <div class="kopf-suchfeld" id="kopf-suchfeld" hidden>
+        <div class="search" role="search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+          <input id="suche-kopf" type="search" placeholder="Suche in allen Inhalten" aria-label="Suche in allen Inhalten">
+          <button type="button" id="suche-kopf-btn">Suchen</button>
+        </div>
+      </div>
+    </div>
+    <button class="pmode-btn" id="pmode" aria-pressed="false">
+      <svg class="bulb" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a6 6 0 0 0-3.5 10.9V17h7v-3.1A6 6 0 0 0 12 3z"/><path d="M9.5 20h5"/></svg>
+      Strukturprinzipien
+    </button>
+    <div class="profile">
+      <button class="profile-btn" id="profile-btn" aria-expanded="false" aria-controls="profile-menu">
+        <span class="avatar" id="avatar">HB</span>
+        <span class="profile-label">
+          <span id="profile-name">Henning Beckmann</span>
+          <span class="profile-role" id="profile-role">Content Creator</span>
+        </span>
+      </button>
+      <div class="profile-menu" id="profile-menu" hidden>
+        <span class="menu-label">Rolle</span>
+        <button type="button" data-rolle="nutzende">Nutzender<span class="menu-erklaerung">Sie lernen und können Inhalte betrachten.</span></button>
+        <button type="button" data-rolle="teilnehmende">Content Creator<span class="menu-erklaerung">Sie lernen und können Inhalte anlegen.</span></button>
+        <button type="button" data-rolle="redaktion">Redaktion<span class="menu-erklaerung">Sie sehen Beiträge, die auf eine Entscheidung warten.</span></button>
+        <button type="button" data-rolle="admin">Administration<span class="menu-erklaerung">Sie sehen zusätzlich den Betrieb.</span></button>
+        <span class="menu-label">Konto</span>
+        <button type="button" id="menu-profil">Mein Profil</button>
+        <button type="button" id="einfach-toggle" aria-pressed="false">Einfache Sprache</button>
+        <button type="button" id="menu-abmelden">Abmelden</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap" id="inhalt">
+
+  <div id="view-sso" class="view" hidden>
+    <div class="hero">
+      <div class="eyebrow">Behördenkonto · ADFS</div>
+      <h1>Anmeldung über das vorhandene Konto</h1>
+      <p class="sub">Henning Beckmann wird über das Active Directory erkannt. Die KI-Werkstatt legt kein eigenes Passwort an und kein zweites Konto.</p>
+      <div class="form-card">
+        <p><strong style="color:var(--text-title)">Henning Beckmann</strong><br>LAFP NRW · Rolle im Prototyp danach wählbar</p>
+        <p class="hint">In der Umsetzung weist die Berechtigung die Rolle zu. Der Prototyp lässt den Wechsel nur, damit der Durchstich durch alle Rollen sichtbar wird.</p>
+        <button type="button" class="btn-solid" id="sso-go">Mit diesem Konto fortfahren</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-home" class="view">
+
+  <!-- Startseite: Einstieg aus der früheren Fassung (Hero, Suche, Lernwege), darunter die Bereichskacheln -->
+  <div class="hero start-hero">
+    <p class="hello" id="hello" hidden data-einfach="Guten Tag. Sie müssen die KI-Werkstatt nicht nutzen. Das ist freiwillig.">Guten Tag, Henning Beckmann. Die Nutzung ist freiwillig.</p>
+    <div class="eyebrow">Lernen · Wissen · Austausch</div>
+    <h1 data-einfach="KI verstehen und sicher nutzen. Direkt für Ihre Arbeit.">KI verstehen und sicher anwenden — direkt aus dem Arbeitsalltag heraus.</h1>
+    <p class="sub" data-einfach="Die KI-Werkstatt ist ein Angebot zum Lernen. Sie ergänzt die Fortbildung. Sie können jederzeit hinein. Es gibt kurze Lektionen, Antworten auf Fragen, Austausch mit Kolleginnen und Kollegen und Berichte aus der Praxis.">Die KI-Werkstatt ergänzt die bestehende Fortbildung um eine jederzeit verfügbare Lern- und Wissensumgebung: kurze Einheiten, verlässliche Antworten, kollegialer Austausch und Impulse aus der Praxis.</p>
+
+    <div class="search" role="search">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+      <input id="suche" type="search" placeholder="Wonach suchen Sie? z. B. Transkription, Prompt, EU-KI-Verordnung …" aria-label="Suche in allen Inhalten">
+      <button type="button" id="suche-btn">Suchen</button>
+    </div>
+
+    <div class="paths prinzip">
+      <span class="p-mark" tabindex="0" role="button" aria-label="Strukturprinzip 2: Lernwege statt Kursräume">2</span><span class="p-tip"><span class="p-kicker">Strukturprinzip 2</span><span class="p-title">Lernwege statt Kursräume</span><span class="p-text">Der Einstieg erfolgt nicht über einen Kurskatalog, sondern über die eigene Ausgangslage. Dahinter stehen kurze Einheiten, die einzeln aktualisiert werden können, gebündelt zu Lernwegen nach Rolle und Vorwissen. Der Pflichtanteil bleibt auf das rechtlich Erforderliche nach der EU-KI-Verordnung begrenzt.</span><span class="p-src">Feinkonzept 5.4.2 · Belegdichte: <b>breit getragen</b></span></span>
+      <div class="path" tabindex="0" data-pfad="anfang">
+        <h3>Ich fange bei null an</h3>
+        <p>Erste Schritte ohne Vorwissen — verständlich erklärt, in kurzen Einheiten.</p>
+        <span class="go">Einstieg starten →</span>
+      </div>
+      <div class="path" tabindex="0" data-pfad="bereits">
+        <h3>Ich nutze KI bereits</h3>
+        <p>Vertiefung für den eigenen Aufgabenbereich — von Auswertung bis Recht.</p>
+        <span class="go">Passende Inhalte finden →</span>
+      </div>
+      <div class="path" tabindex="0" data-pfad="frage">
+        <h3>Ich habe eine konkrete Frage</h3>
+        <p>Antworten über Suche, FAQ oder Glossar. Foren folgen später.</p>
+        <span class="go">Frage klären →</span>
+      </div>
+    </div>
+
+    <div class="entry-row">
+      <article class="entry-card" id="orient-card">
+        <p class="entry-kicker">Orientierung · 3 Minuten</p>
+        <h3>Zweck, Freiwilligkeit, Aufbau</h3>
+        <p data-einfach="Ein kurzes Video und derselbe Text daneben. So sehen Sie, was die KI-Werkstatt ist.">Ein kurzes Video mit derselben Aussage als Text. Beides steht auf der Einstiegsseite, ohne weiteren Weg.</p>
+        <button type="button" class="btn-line" id="orient-btn" aria-expanded="false" aria-controls="orient-panel">Orientierung anzeigen</button>
+        <div id="orient-panel" hidden>
+          <div class="orient-steps">
+            <article>
+              <h4>Zweck</h4>
+              <p>Beschäftigte bauen KI-Wissen auf. Kolleginnen und Kollegen teilen eigene Praxisbeispiele.</p>
+            </article>
+            <article>
+              <h4>Freiwilligkeit</h4>
+              <p>Die Nutzung ist freiwillig. Es gibt keinen Einstufungstest und keine Pflichtreihenfolge.</p>
+            </article>
+            <article>
+              <h4>Aufbau</h4>
+              <p>Inhalte tragen genau eine Niveaustufe: Basis, Aufbau, Spezial oder Profi. Die Stufe gehört zum Inhalt, nicht zur Person.</p>
+            </article>
+          </div>
+        </div>
+      </article>
+      <article class="entry-card" id="sofort-card">
+        <p class="entry-kicker">Sofort starten · unter 10 Minuten</p>
+        <h3 id="sofort-titel">Berichte zusammenfassen: mein Vorgehen Schritt für Schritt</h3>
+        <p id="sofort-text">Ein Praxisbeitrag aus der Rubrik Impulse, direkt von der Einstiegsseite.</p>
+        <button type="button" class="btn-solid" id="sofort-btn">Praxisbeitrag starten</button>
+      </article>
+      <article class="entry-card">
+        <p class="entry-kicker">Vor der ersten Nutzung</p>
+        <h3>Erlaubnis und Prüfschritte</h3>
+        <p>Zwei Hinweise, die von hier in ein bis zwei Klicks erreichbar sind.</p>
+        <div class="entry-actions">
+          <button type="button" class="btn-line" data-action="faq-sprung" data-faq="erlaubnis">Erlaubnisfragen</button>
+          <button type="button" class="btn-line" data-open="grenzen-daten">Was nicht hineingehört</button>
+        </div>
+      </article>
+    </div>
+  </div><!-- start-hero -->
+
+  <!-- Bereiche der früheren Startseite. Inhalte kommen aus denselben Daten wie die Unterseiten (app.js: renderStart). -->
+
+  <!-- INHALTE -->
+  <section class="start-bereich" id="start-inhalte" aria-labelledby="start-inhalte-titel">
+    <div class="section-head">
+      <h2 id="start-inhalte-titel">Inhalte entdecken</h2>
+      <span class="hint prinzip">
+        <span class="p-mark" tabindex="0" role="button" aria-label="Strukturprinzip 4: Redaktion als Daueraufgabe">4</span><span class="p-tip" data-align="right"><span class="p-kicker">Strukturprinzip 4</span><span class="p-title">Redaktion als Daueraufgabe</span><span class="p-text">Jeder Inhalt ist fachlich geprüft und benennbar verantwortet. Ein Redaktionskonzept regelt für alle Kanäle, wer erstellt, prüft und freigibt und wie Widersprüche zwischen den Kanälen vermieden werden. Der Betrieb ist als Daueraufgabe angelegt, nicht als einmalige Initiative: Verwaiste Angebote richten mehr Schaden an als nie gestartete.</span><span class="p-src">Feinkonzept 5.4.1 · Risiko „Die KI-Werkstatt zwischen Aufbau und Alltag“ (Kapitel 9)</span></span>
+        Redaktionell geprüft und laufend aktualisiert
+      </span>
+    </div>
+    <div class="filters prinzip start-filter" data-scope="start" aria-label="Lektionen auf der Startseite filtern">
+      <span class="p-mark" tabindex="0" role="button" aria-label="Strukturprinzip 3: Auffindbar nach Rolle und Vorwissen">3</span><span class="p-tip"><span class="p-kicker">Strukturprinzip 3</span><span class="p-title">Auffindbar nach Rolle und Vorwissen</span><span class="p-text">Dieselbe Sammlung, fünf Zugänge: Art, Niveau, Anwendungsfeld, Thema und KI-Tool. Es sind dieselben Merkmale, die beim Anlegen eines Inhalts vergeben werden. Wer nur zehn Minuten hat, findet ebenso etwas wie jemand, der ein Thema vertiefen will. Filterkombinationen ohne Treffer sind kein Fehler, sondern ein Hinweis an die Redaktion, wo das Angebot noch Lücken hat.</span><span class="p-src">Feinkonzept 5.4.1 und 5.4.2 · operative Ziele HF 6.2</span></span>
+      <p class="filter-lead">Ein Merkmal wählen: Die Lektionen darunter passen sich sofort an.</p>
+      <div class="filter-status">
+        <span class="fcount" role="status" aria-live="polite"></span>
+        <button class="freset" type="button" data-filter-reset="start" hidden>Filter zurücksetzen</button>
+      </div>
+      <div id="start-filter-gruppen" class="filter-gruppen"></div>
+    </div>
+    <div class="grid" id="start-lektionen"></div>
+    <p class="meta-line" id="start-lektionen-leer" hidden>Keine Lektion entspricht dieser Auswahl. Setzen Sie einen Filter zurück oder wählen Sie ein anderes Merkmal.</p>
+    <div class="start-mehr"><button type="button" class="btn-line" data-view-jump="inhalte" data-frisch="1">Alle Lektionen →</button></div>
+  </section>
+
+  <!-- IMPULSE AUS DER PRAXIS -->
+  <section class="start-bereich" id="start-impulse" aria-labelledby="start-impulse-titel">
+    <div class="section-head">
+      <h2 id="start-impulse-titel">Impulse aus der Praxis</h2>
+      <span class="hint">Von Kolleginnen und Kollegen, die es bereits anwenden</span>
+    </div>
+    <div class="impulse-intro prinzip">
+      <span class="p-mark" tabindex="0" role="button" aria-label="Strukturprinzip 6: Glaubwürdige Gesichter aus der Belegschaft">6</span><span class="p-tip"><span class="p-kicker">Strukturprinzip 6</span><span class="p-title">Glaubwürdige Gesichter aus der Belegschaft</span><span class="p-text">Die Beiträge stammen nicht aus der Lehre, sondern aus dem Dienstalltag. Impulsgeberinnen und Impulsgeber berichten aus eigener Erfahrung, ausdrücklich auch über misslungene Versuche. Damit trägt die Rubrik zugleich die Kernbotschaft des Konzepts: Beim Ausprobieren kann nichts beschädigt werden.</span><span class="p-src">Feinkonzept 5.4.3 · Kernbotschaft aus 6.4.1 · Meilenstein HF 6.2 M3.7</span></span>
+      <p>Hier berichten <strong>Impulsgeberinnen und Impulsgeber</strong> aus den Behörden von ihrer eigenen Arbeit mit Künstlicher Intelligenz: was sich bewährt hat, was misslungen ist und was sie beim nächsten Mal anders machen würden. Die Beiträge stammen nicht aus der Fortbildung, sondern aus dem Dienstalltag — und stehen als Live-Session, Podcast oder kurzes Tutorial zur Verfügung.</p>
+    </div>
+    <div class="impulse-grid" id="start-impuls-liste"></div>
+    <div class="impulse-cta">
+      <div>
+        <h3>Sie arbeiten bereits mit KI? Werden Sie Impulsgeberin oder Impulsgeber.</h3>
+        <p>Es braucht keinen Expertenstatus — es braucht Erfahrung aus dem Alltag. Auch der Bericht über einen misslungenen Versuch ist ein wertvoller Impuls. Die Redaktion unterstützt bei Aufbereitung, Aufnahme und Veröffentlichung.</p>
+      </div>
+      <button class="btn-solid" type="button" id="start-impuls-anbieten">Impuls anbieten</button>
+    </div>
+    <div class="start-mehr"><button type="button" class="btn-line" data-view-jump="impulse">Alle Impulse →</button></div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="start-bereich" id="start-faq" aria-labelledby="start-faq-titel">
+    <div class="section-head">
+      <h2 id="start-faq-titel">Häufige Fragen zum Einstieg</h2>
+      <span class="hint">Der schnellste Weg zu einer verlässlichen Antwort</span>
+    </div>
+    <div class="faq-list" id="start-faq-liste"></div>
+    <div class="start-mehr"><button type="button" class="btn-line" data-view-jump="faq">Alle häufigen Fragen →</button></div>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section class="start-bereich" id="start-community" aria-labelledby="start-community-titel">
+    <div class="section-head">
+      <h2 id="start-community-titel">Aus der Community</h2>
+      <span class="hint">Fragen stellen, Erfahrungen teilen, voneinander lernen</span>
+    </div>
+    <div class="community-wrap prinzip">
+      <span class="p-mark" tabindex="0" role="button" aria-label="Strukturprinzip 7: Beteiligung über Behördengrenzen hinweg">7</span><span class="p-tip"><span class="p-kicker">Strukturprinzip 7</span><span class="p-title">Beteiligung über Behördengrenzen hinweg</span><span class="p-text">Fragen werden nicht an eine zentrale Stelle gerichtet, sondern in die Fläche. Kolleginnen und Kollegen aus ganz Nordrhein-Westfalen antworten einander, fachlich gekennzeichnete Personen ergänzen, wo es in die Tiefe geht. Wer mitgestaltet, trägt das Ergebnis mit.</span><span class="p-src">Feinkonzept 5.4.3 · operatives Ziel HF 6.2: Lernen voneinander, auch über Behördengrenzen hinweg</span></span>
+      <div id="start-community-liste"></div>
+      <aside class="community-side">
+        <h3>Ihre Frage ist hier richtig.</h3>
+        <p>Ob Grundsatzfrage oder Spezialfall: In der Community antworten Kolleginnen und Kollegen aus ganz NRW. Fragen stellen und eigene Beiträge löschen folgen später.</p>
+        <button type="button" class="btn-line" data-view-jump="community">Zur Community →</button>
+      </aside>
+    </div>
+  </section>
+
+  <!-- LIVE -->
+  <section class="start-bereich" id="start-live" aria-labelledby="start-live-titel">
+    <h2 class="visually-hidden" id="start-live-titel">Nächste Live-Session</h2>
+    <div class="prinzip p-wrap">
+      <span class="p-mark" tabindex="0" role="button" aria-label="Strukturprinzip 8: Offene Formate, digital und analog">8</span><span class="p-tip"><span class="p-kicker">Strukturprinzip 8</span><span class="p-title">Offene Formate, digital und analog</span><span class="p-text">Neben den jederzeit abrufbaren Inhalten stehen feste offene Formate: Sprechstunden, Live-Sessions und Hackathons. Sie werden bewusst um Formate in Präsenz ergänzt, weil digitale Werkzeuge nicht ausschließlich mit digitalen Formaten begleitet werden sollten, ohne dass zwischenmenschliche Beziehungen verloren gehen.</span><span class="p-src">Feinkonzept 5.4.2 und 5.4.3 · analoge Ergänzung: Krutwage/Port</span></span>
+      <div id="start-live-liste"></div>
+    </div>
+    <div class="start-mehr"><button type="button" class="btn-line" data-view-jump="live">Alle Live-Sessions →</button></div>
+  </section>
+
+  </div><!-- view-home -->
+
+  <div id="view-suche" class="view" hidden>
+    <button type="button" class="backlink" data-view-jump="home">← Startseite</button>
+    <h1>Suchergebnisse</h1>
+    <p id="suche-frage">Die Suche geht über Lektionen, Impulse, Live-Sessions, Communitys und die häufigen Fragen.</p>
+    <div id="suche-treffer"></div>
+  </div>
+
+  <div id="view-inhalte" class="view" hidden>
+  <button type="button" class="backlink" data-view-jump="home">← Startseite</button>
+    <h1>Lektionen</h1>
+    <p>Nur Lektionen. Begonnene und abgeschlossene Lektionen öffnen Sie über die Kacheln.</p>
+    <div class="lauf-hub" id="lauf-hub">
+      <button type="button" class="hub-tile" data-view-jump="lauf-begonnen" data-herkunft="begonnen">
+        <span class="zahl-badge zahl-begonnen">0</span>
+        <span class="hub-titel">Begonnene Lektionen</span>
+        <span class="hub-text">Geöffnet, noch nicht abgeschlossen.</span>
+        <span class="go">Lektionen öffnen</span>
+      </button>
+      <button type="button" class="hub-tile" data-view-jump="lauf-abgeschlossen" data-herkunft="abgeschlossen">
+        <span class="zahl-badge zahl-abgeschlossen">0</span>
+        <span class="hub-titel">Abgeschlossene Lektionen</span>
+        <span class="hub-text">Von Ihnen als abgeschlossen markiert.</span>
+        <span class="go">Lektionen öffnen</span>
+      </button>
+    </div>
+    <section class="inhaltsbereich bereich-allgemein" id="inhalte" aria-labelledby="uebrige-titel">
+    <h2 class="bereich-titel" id="uebrige-titel">Verfügbare Lektionen</h2>
+    <p class="meta-line prinzip">
+      <span class="p-mark" tabindex="0" role="button" aria-label="Strukturprinzip 4: Redaktion als Daueraufgabe">4</span><span class="p-tip" data-align="right"><span class="p-kicker">Strukturprinzip 4</span><span class="p-title">Redaktion als Daueraufgabe</span><span class="p-text">Jeder Inhalt ist fachlich geprüft und benennbar verantwortet. Ein Redaktionskonzept regelt für alle Kanäle, wer erstellt, prüft und freigibt und wie Widersprüche zwischen den Kanälen vermieden werden. Der Betrieb ist als Daueraufgabe angelegt, nicht als einmalige Initiative: Verwaiste Angebote richten mehr Schaden an als nie gestartete.</span><span class="p-src">Feinkonzept 5.4.1 · Risiko „Die KI-Werkstatt zwischen Aufbau und Alltag“ (Kapitel 9)</span></span>
+      Redaktionell geprüft und laufend aktualisiert
+    </p>
+
+    <p class="banner" id="pfadhinweis" hidden></p>
+    <div class="search bereich-suche" role="search">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+      <input id="suche-inhalte" type="search" placeholder="Lektion suchen, z. B. Transkription, Prompt, EU-KI-Verordnung …" aria-label="Suche in den verfügbaren Lektionen">
+      <button type="button" id="suche-inhalte-btn">Suchen</button>
+    </div>
+    <div class="filters prinzip" data-scope="lektion" aria-label="Verfügbare Lektionen filtern">
+      <span class="p-mark" tabindex="0" role="button" aria-label="Strukturprinzip 3: Auffindbar nach Rolle und Vorwissen">3</span><span class="p-tip"><span class="p-kicker">Strukturprinzip 3</span><span class="p-title">Auffindbar nach Rolle und Vorwissen</span><span class="p-text">Dieselbe Sammlung, fünf Zugänge: Art, Niveau, Anwendungsfeld, Thema und KI-Tool. Es sind dieselben Merkmale, die beim Anlegen eines Inhalts vergeben werden. Wer nur zehn Minuten hat, findet ebenso etwas wie jemand, der ein Thema vertiefen will. Filterkombinationen ohne Treffer sind kein Fehler, sondern ein Hinweis an die Redaktion, wo das Angebot noch Lücken hat.</span><span class="p-src">Feinkonzept 5.4.1 und 5.4.2 · operative Ziele HF 6.2</span></span>
+      <p class="filter-lead">Suche und Filter gelten nur für die verfügbaren Lektionen.</p>
+      <div class="filter-status">
+        <span class="fcount" id="fcount" role="status" aria-live="polite">Alle verfügbaren Lektionen werden angezeigt.</span>
+        <button class="freset" id="freset" type="button" data-filter-reset="lektion" hidden>Filter zurücksetzen</button>
+      </div>
+      <!-- Filtergruppen kommen aus app.js (FILTER_GRUPPEN.lektion), mit denselben Werten wie im Editor -->
+      <div id="lektion-filter-gruppen" class="filter-gruppen"></div>
+    </div>
+
+    <div class="grid" id="katalog-grid">
+
+      <article class="tile t1" tabindex="0" data-id="transkription" data-werkzeug="transkription" data-thema="einsatzfelder" data-format="video" data-niveau="basis" data-zielgruppe="ermittlung">
+        <div class="thumb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C9E0EE" stroke-width="1.6"><polygon points="9 6 19 12 9 18" fill="#C9E0EE" stroke="none"/></svg>
+          <span class="fmt">Video · 8 Min.</span>
+        </div>
+        <div class="tile-body">
+          <div class="badges"><span class="lvl basis">Basis</span></div>
+          <h3>Automatisierte Transkription in der Vernehmung — so funktioniert's</h3>
+          <p>Was das System leistet, wo es an Grenzen stößt und welche Prüfschritte bleiben.</p>
+          <div class="tile-foot">
+            <button class="likebtn" data-count="87">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V4a2 2 0 0 0-2-2l-3 8v11h9.3a2 2 0 0 0 2-1.7l1.3-8a2 2 0 0 0-2-2.3H14z"/><path d="M9 21H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h4"/></svg>
+              <span class="cnt">87</span>
+            </button>
+            <span class="meta-ic">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg>
+              14 Kommentare
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t2" tabindex="0" data-id="sprachmodelle" data-werkzeug="sprachmodell" data-thema="grundlagen" data-format="lernmodul" data-niveau="basis" data-zielgruppe="ermittlung fuehrung verwaltung">
+        <div class="thumb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C9E0EE" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+          <span class="fmt">Lernmodul · 25 Min.</span>
+        </div>
+        <div class="tile-body">
+          <div class="badges"><span class="lvl basis">Basis</span></div>
+          <h3>Grundlagen KI: Wie Sprachmodelle Texte erzeugen</h3>
+          <p>Das Grundprinzip in drei Schritten — und warum eine flüssige Antwort allein nichts beweist.</p>
+          <div class="tile-foot">
+            <button class="likebtn" data-count="142">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V4a2 2 0 0 0-2-2l-3 8v11h9.3a2 2 0 0 0 2-1.7l1.3-8a2 2 0 0 0-2-2.3H14z"/><path d="M9 21H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h4"/></svg>
+              <span class="cnt">142</span>
+            </button>
+            <span class="meta-ic">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg>
+              31 Kommentare
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t3" tabindex="0" data-id="eu-ki" data-werkzeug="keins" data-thema="recht" data-format="artikel" data-niveau="aufbau" data-zielgruppe="ermittlung fuehrung verwaltung">
+        <div class="thumb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C9E0EE" stroke-width="1.6"><path d="M6 3h9l5 5v13H6z"/><path d="M15 3v5h5"/><path d="M9 13h7M9 17h7"/></svg>
+          <span class="fmt">Artikel · 6 Min.</span>
+        </div>
+        <div class="tile-body">
+          <div class="badges"><span class="lvl aufbau">Aufbau</span></div>
+          <h3>EU-KI-Verordnung, Artikel 4: Was gilt für meine Rolle?</h3>
+          <p>Die Qualifizierungspflicht verständlich eingeordnet — nach Aufgabenbereich und Verantwortung.</p>
+          <div class="tile-foot">
+            <button class="likebtn" data-count="63">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V4a2 2 0 0 0-2-2l-3 8v11h9.3a2 2 0 0 0 2-1.7l1.3-8a2 2 0 0 0-2-2.3H14z"/><path d="M9 21H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h4"/></svg>
+              <span class="cnt">63</span>
+            </button>
+            <span class="meta-ic">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg>
+              9 Kommentare
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t4" tabindex="0" data-id="prompt" data-werkzeug="sprachmodell" data-thema="grundlagen" data-format="video" data-niveau="aufbau" data-zielgruppe="ermittlung verwaltung">
+        <div class="thumb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C9E0EE" stroke-width="1.6"><polygon points="9 6 19 12 9 18" fill="#C9E0EE" stroke="none"/></svg>
+          <span class="fmt">Video · 12 Min.</span>
+        </div>
+        <div class="tile-body">
+          <div class="badges"><span class="lvl aufbau">Aufbau</span></div>
+          <h3>Prompt-Engineering I: Präzise Anfragen für Auswertungen</h3>
+          <p>Vom vagen Auftrag zur brauchbaren Antwort — mit Beispielen aus der Sachbearbeitung.</p>
+          <div class="tile-foot">
+            <button class="likebtn" data-count="118">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V4a2 2 0 0 0-2-2l-3 8v11h9.3a2 2 0 0 0 2-1.7l1.3-8a2 2 0 0 0-2-2.3H14z"/><path d="M9 21H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h4"/></svg>
+              <span class="cnt">118</span>
+            </button>
+            <span class="meta-ic">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg>
+              22 Kommentare
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t5" tabindex="0" data-id="sprachanalyse" data-werkzeug="auswertung" data-thema="einsatzfelder" data-format="live" data-niveau="spezial" data-zielgruppe="ermittlung">
+        <div class="thumb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C9E0EE" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.2"/></svg>
+          <span class="fmt">Aufzeichnung · 45 Min.</span>
+        </div>
+        <div class="tile-body">
+          <div class="badges"><span class="lvl spezial">Spezial</span></div>
+          <h3>KI-gestützte Sprachanalyse im Ermittlungsverfahren</h3>
+          <p>Live-Session mit Fachleuten aus Technik und Recht — Fragen aus der Praxis inklusive.</p>
+          <div class="tile-foot">
+            <button class="likebtn" data-count="54">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V4a2 2 0 0 0-2-2l-3 8v11h9.3a2 2 0 0 0 2-1.7l1.3-8a2 2 0 0 0-2-2.3H14z"/><path d="M9 21H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h4"/></svg>
+              <span class="cnt">54</span>
+            </button>
+            <span class="meta-ic">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg>
+              11 Kommentare
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t6" tabindex="0" data-id="halluzinationen" data-werkzeug="sprachmodell" data-thema="grundlagen ethik" data-format="artikel" data-niveau="basis" data-zielgruppe="ermittlung fuehrung verwaltung">
+        <div class="thumb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C9E0EE" stroke-width="1.6"><path d="M6 3h9l5 5v13H6z"/><path d="M15 3v5h5"/><path d="M9 13h7M9 17h7"/></svg>
+          <span class="fmt">Artikel · 5 Min.</span>
+        </div>
+        <div class="tile-body">
+          <div class="badges"><span class="lvl basis">Basis</span></div>
+          <h3>Halluzinationen erkennen: Drei Prüfschritte für den Alltag</h3>
+          <p>Woran Sie überzeugend klingende, aber falsche Antworten erkennen — und wie Sie reagieren.</p>
+          <div class="tile-foot">
+            <button class="likebtn" data-count="96">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V4a2 2 0 0 0-2-2l-3 8v11h9.3a2 2 0 0 0 2-1.7l1.3-8a2 2 0 0 0-2-2.3H14z"/><path d="M9 21H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h4"/></svg>
+              <span class="cnt">96</span>
+            </button>
+            <span class="meta-ic">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg>
+              17 Kommentare
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t7" tabindex="0" data-id="impuls-auswertung" data-werkzeug="auswertung" data-thema="einsatzfelder" data-format="impuls" data-niveau="basis" data-zielgruppe="ermittlung">
+        <div class="thumb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C9E0EE" stroke-width="1.6"><path d="M12 3a6 6 0 0 0-3.5 10.9V17h7v-3.1A6 6 0 0 0 12 3z"/><path d="M9.5 20h5"/></svg>
+          <span class="fmt">Impuls · 45 Min.</span>
+        </div>
+        <div class="tile-body">
+          <div class="badges"><span class="lvl basis">Basis</span><span class="lvl impulstag">Impuls aus der Praxis</span></div>
+          <h3>Wie wir im Ermittlungsteam die Auswertung umgestellt haben</h3>
+          <p>Erfahrungsbericht aus vier Monaten Praxis — einschließlich des ersten Fehlversuchs.</p>
+          <div class="tile-foot">
+            <button class="likebtn" data-count="58">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V4a2 2 0 0 0-2-2l-3 8v11h9.3a2 2 0 0 0 2-1.7l1.3-8a2 2 0 0 0-2-2.3H14z"/><path d="M9 21H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h4"/></svg>
+              <span class="cnt">58</span>
+            </button>
+            <span class="meta-ic">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg>
+              19 Kommentare
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t8" tabindex="0" data-id="fuehrung" data-werkzeug="keins" data-thema="grundlagen" data-format="lernmodul" data-niveau="aufbau" data-zielgruppe="fuehrung">
+        <div class="thumb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C9E0EE" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+          <span class="fmt">Lernmodul · 30 Min.</span>
+        </div>
+        <div class="tile-body">
+          <div class="badges"><span class="lvl aufbau">Aufbau</span></div>
+          <h3>KI im eigenen Bereich einführen: Was Führungskräfte vorab klären sollten</h3>
+          <p>Von der Erwartungshaltung bis zum Umgang mit Skepsis im Team — in fünf Schritten.</p>
+          <div class="tile-foot">
+            <button class="likebtn" data-count="74">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V4a2 2 0 0 0-2-2l-3 8v11h9.3a2 2 0 0 0 2-1.7l1.3-8a2 2 0 0 0-2-2.3H14z"/><path d="M9 21H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h4"/></svg>
+              <span class="cnt">74</span>
+            </button>
+            <span class="meta-ic">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg>
+              12 Kommentare
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t9" tabindex="0" data-id="schriftverkehr" data-werkzeug="sprachmodell" data-thema="einsatzfelder" data-format="video" data-niveau="basis" data-zielgruppe="verwaltung">
+        <div class="thumb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C9E0EE" stroke-width="1.6"><polygon points="9 6 19 12 9 18" fill="#C9E0EE" stroke="none"/></svg>
+          <span class="fmt">Video · 7 Min.</span>
+        </div>
+        <div class="tile-body">
+          <div class="badges"><span class="lvl basis">Basis</span></div>
+          <h3>Schriftverkehr und Vermerke: Entlastung im Verwaltungsalltag</h3>
+          <p>Wo Textbausteine sinnvoll unterstützen — und welche Aufgaben ausdrücklich bei Ihnen bleiben.</p>
+          <div class="tile-foot">
+            <button class="likebtn" data-count="51">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V4a2 2 0 0 0-2-2l-3 8v11h9.3a2 2 0 0 0 2-1.7l1.3-8a2 2 0 0 0-2-2.3H14z"/><path d="M9 21H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h4"/></svg>
+              <span class="cnt">51</span>
+            </button>
+            <span class="meta-ic">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg>
+              8 Kommentare
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t10" tabindex="0" data-id="verzerrungen" data-werkzeug="auswertung" data-thema="ethik recht" data-format="artikel" data-niveau="profi" data-zielgruppe="ermittlung fuehrung">
+        <div class="thumb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C9E0EE" stroke-width="1.6"><path d="M6 3h9l5 5v13H6z"/><path d="M15 3v5h5"/><path d="M9 13h7M9 17h7"/></svg>
+          <span class="fmt">Artikel · 11 Min.</span>
+        </div>
+        <div class="tile-body">
+          <div class="badges"><span class="lvl profi">Profi</span></div>
+          <h3>Verzerrungen in automatisierten Auswertungen erkennen</h3>
+          <p>Woher systematische Fehler stammen, wie sie sichtbar werden und welche Kontrollen greifen.</p>
+          <div class="tile-foot">
+            <button class="likebtn" data-count="39">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V4a2 2 0 0 0-2-2l-3 8v11h9.3a2 2 0 0 0 2-1.7l1.3-8a2 2 0 0 0-2-2.3H14z"/><path d="M9 21H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h4"/></svg>
+              <span class="cnt">39</span>
+            </button>
+            <span class="meta-ic">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg>
+              22 Kommentare
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t1" tabindex="0" data-id="grenzen-daten" data-werkzeug="sprachmodell" data-thema="grundlagen recht" data-format="artikel" data-niveau="basis" data-zielgruppe="ermittlung fuehrung verwaltung">
+        <div class="thumb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C9E0EE" stroke-width="1.6"><path d="M6 3h9l5 5v13H6z"/><path d="M15 3v5h5"/><path d="M9 13h7M9 17h7"/></svg>
+          <span class="fmt">Artikel · 6 Min.</span>
+        </div>
+        <div class="tile-body">
+          <div class="badges"><span class="lvl basis">Basis</span><span class="lvl impulstag">Vor der Nutzung</span></div>
+          <h3>Was nicht in das Werkzeug gehört</h3>
+          <p>Eine kurze Grenze vor der ersten Nutzung: welche Angaben draußen bleiben und wo die Regelung steht.</p>
+          <div class="tile-foot"><span class="meta-ic">Grundlagenkanon</span></div>
+        </div>
+      </article>
+
+      <article class="tile t2" tabindex="0" data-id="ergebnis-pruefen" data-werkzeug="sprachmodell" data-thema="grundlagen" data-format="lernmodul" data-niveau="basis" data-zielgruppe="ermittlung fuehrung verwaltung">
+        <div class="thumb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C9E0EE" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+          <span class="fmt">Lernmodul · 8 Min.</span>
+        </div>
+        <div class="tile-body">
+          <div class="badges"><span class="lvl basis">Basis</span></div>
+          <h3>Ergebnisse prüfen, bevor sie weitergehen</h3>
+          <p>Der eine Schritt, der aus einem Entwurf ein Ergebnis macht, das Sie selbst verantworten können.</p>
+          <div class="tile-foot"><span class="meta-ic">Grundlagenkanon · H5P</span></div>
+        </div>
+      </article>
+
+      <article class="tile t4" tabindex="0" data-id="alltag-grenzen" data-werkzeug="keins" data-thema="grundlagen" data-format="artikel" data-niveau="basis" data-zielgruppe="ermittlung fuehrung verwaltung">
+        <div class="thumb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#C9E0EE" stroke-width="1.6"><path d="M6 3h9l5 5v13H6z"/><path d="M15 3v5h5"/><path d="M9 13h7M9 17h7"/></svg>
+          <span class="fmt">Artikel · 7 Min.</span>
+        </div>
+        <div class="tile-body">
+          <div class="badges"><span class="lvl basis">Basis</span></div>
+          <h3>Wo KI im Arbeitsalltag an Grenzen stößt</h3>
+          <p>Vier Grenzen, die in jedem Tätigkeitsfeld gelten — knapp genug für den Arbeitstag.</p>
+          <div class="tile-foot"><span class="meta-ic">Grundlagenkanon</span></div>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="empty" id="empty" hidden>
+      <h3>Zu dieser Auswahl liegt noch keine Lektion vor.</h3>
+      <p>Setzen Sie einzelne Filter zurück — oder melden Sie den Bedarf der Redaktion. Lücken im Angebot sind ein wichtiger Hinweis für die Weiterentwicklung.</p>
+      <button class="btn-line" id="empty-reset" type="button" data-filter-reset="lektion">Filter zurücksetzen</button>
+    </div>
+
+    </section>
+  </div><!-- view-inhalte -->
+
+  <div id="view-impulse" class="view" hidden>
+    <button type="button" class="backlink" data-view-jump="home">← Startseite</button>
+    <h1>Impulse</h1>
+    <p>Kurze Beiträge aus dem Dienstalltag. Begonnene und abgeschlossene Impulse öffnen Sie über die Kacheln.</p>
+    <div class="lauf-hub" id="impuls-hub">
+      <button type="button" class="hub-tile" data-view-jump="impuls-begonnen" data-herkunft="impuls-begonnen">
+        <span class="zahl-badge zahl-impuls-begonnen">0</span>
+        <span class="hub-titel">Begonnene Impulse</span>
+        <span class="hub-text">Geöffnet, noch nicht abgeschlossen.</span>
+        <span class="go">Impulse öffnen</span>
+      </button>
+      <button type="button" class="hub-tile" data-view-jump="impuls-abgeschlossen" data-herkunft="impuls-abgeschlossen">
+        <span class="zahl-badge zahl-impuls-abgeschlossen">0</span>
+        <span class="hub-titel">Abgeschlossene Impulse</span>
+        <span class="hub-text">Von Ihnen als abgeschlossen markiert.</span>
+        <span class="go">Impulse öffnen</span>
+      </button>
+    </div>
+    <section class="inhaltsbereich bereich-impuls" id="impulse" aria-labelledby="impulse-titel">
+      <h2 class="bereich-titel" id="impulse-titel">Verfügbare Impulse</h2>
+      <p class="meta-line">Nur veröffentlichte Impulse, die nicht Ihnen gehören und die Sie noch nicht begonnen haben.</p>
+      <div class="impulse-intro prinzip">
+        <span class="p-mark" tabindex="0" role="button" aria-label="Strukturprinzip 6: Glaubwürdige Gesichter aus der Belegschaft">6</span><span class="p-tip"><span class="p-kicker">Strukturprinzip 6</span><span class="p-title">Glaubwürdige Gesichter aus der Belegschaft</span><span class="p-text">Die Beiträge stammen nicht aus der Lehre, sondern aus dem Dienstalltag. Impulsgeberinnen und Impulsgeber berichten aus eigener Erfahrung, ausdrücklich auch über misslungene Versuche. Damit trägt die Rubrik zugleich die Kernbotschaft des Konzepts: Beim Ausprobieren kann nichts beschädigt werden.</span><span class="p-src">Feinkonzept 5.4.3 · Kernbotschaft aus 6.4.1 · Meilenstein HF 6.2 M3.7</span></span>
+        <p>Hier berichten <strong>Impulsgeberinnen und Impulsgeber</strong> aus den Behörden von ihrer eigenen Arbeit mit Künstlicher Intelligenz: was sich bewährt hat, was misslungen ist und was sie beim nächsten Mal anders machen würden.</p>
+      </div>
+      <div id="filter-slot-impuls"></div>
+      <ul class="happen" id="impulse-alle">
+        <li><button type="button" data-open="impuls-auswertung">Wie wir im Ermittlungsteam die Auswertung umgestellt haben<span>45 Min.</span></button></li>
+        <li><button type="button" data-open="skeptikerin">Ich war die Skeptikerin im Team<span>18 Min.</span></button></li>
+        <li><button type="button" data-open="berichte">Berichte zusammenfassen: mein Vorgehen Schritt für Schritt<span>9 Min.</span></button></li>
+      </ul>
+      <p class="meta-line" id="impuls-filter-leer" hidden>Kein Impuls entspricht dieser Auswahl.</p>
+      <div class="impulse-cta">
+        <div>
+          <h3>Sie arbeiten bereits mit KI? Werden Sie Impulsgeberin oder Impulsgeber.</h3>
+          <p>Es braucht keinen Expertenstatus — es braucht Erfahrung aus dem Alltag. Auch der Bericht über einen misslungenen Versuch ist ein wertvoller Impuls. Die Redaktion unterstützt bei Aufbereitung, Aufnahme und Veröffentlichung.</p>
+        </div>
+        <button class="btn-solid" type="button" id="impuls-anbieten">Impuls anbieten</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="view-community" class="view" hidden>
+    <button type="button" class="backlink" data-view-jump="home">← Startseite</button>
+    <h1 id="community-titel">Community</h1>
+    <p>Zwei Bereiche auf dieser Seite: Bereiche, an denen Sie mitwirken, und verfügbare Communitys.</p>
+    <div id="community" aria-labelledby="community-mit-titel">
+      <div class="community-wrap prinzip">
+        <span class="p-mark" tabindex="0" role="button" aria-label="Strukturprinzip 7: Beteiligung über Behördengrenzen hinweg">7</span><span class="p-tip"><span class="p-kicker">Strukturprinzip 7</span><span class="p-title">Beteiligung über Behördengrenzen hinweg</span><span class="p-text">Fragen werden nicht an eine zentrale Stelle gerichtet, sondern in die Fläche. Kolleginnen und Kollegen aus ganz Nordrhein-Westfalen antworten einander, fachlich gekennzeichnete Personen ergänzen, wo es in die Tiefe geht. Wer mitgestaltet, trägt das Ergebnis mit.</span><span class="p-src">Feinkonzept 5.4.3 · operatives Ziel HF 6.2: Lernen voneinander, auch über Behördengrenzen hinweg</span></span>
+        <aside class="community-side">
+          <h2>Ihre Frage ist hier richtig.</h2>
+          <p>Ob Grundsatzfrage oder Spezialfall: In der Community antworten Kolleginnen und Kollegen aus ganz NRW. Fragen stellen und eigene Beiträge löschen folgen später.</p>
+          <button type="button" class="btn-line" id="community-mehr">Was später kommt</button>
+        </aside>
+      </div>
+      <h2 class="bereich-titel" id="community-mit-titel">Bereiche, an denen ich mitwirke</h2>
+      <p class="meta-line">Communitys, in denen Sie dabei sind. Den Austausch selbst gibt es in dieser Fassung noch nicht.</p>
+      <div id="community-mit-liste"></div>
+      <p class="meta-line" id="community-mit-leer" hidden>Sie wirken noch in keinem Bereich mit.</p>
+      <h2 class="bereich-titel" id="community-frei-titel">Verfügbare Communitys</h2>
+      <p class="meta-line">Bereiche, denen Sie noch nicht beigetreten sind. Suche und Filter gelten nur für diese Liste.</p>
+      <div id="filter-slot-community"></div>
+      <div id="community-frei-liste"></div>
+      <p class="meta-line" id="community-frei-leer" hidden>Keine weitere Community.</p>
+      <p class="meta-line" id="community-filter-leer" hidden>Keine Community entspricht dieser Auswahl.</p>
+    </div>
+  </div>
+
+  <div id="view-live" class="view" hidden>
+    <button type="button" class="backlink" data-view-jump="home">← Startseite</button>
+    <h1 id="live-titel">Live-Sessions</h1>
+    <p>Zwei Bereiche auf dieser Seite: Sessions, an denen Sie teilgenommen haben, und verfügbare Sessions.</p>
+    <div id="live" aria-labelledby="live-dabei-titel">
+      <div class="prinzip p-wrap">
+        <span class="p-mark" tabindex="0" role="button" aria-label="Strukturprinzip 8: Offene Formate, digital und analog">8</span><span class="p-tip"><span class="p-kicker">Strukturprinzip 8</span><span class="p-title">Offene Formate, digital und analog</span><span class="p-text">Neben den jederzeit abrufbaren Inhalten stehen feste offene Formate: Sprechstunden, Live-Sessions und Hackathons. Sie werden bewusst um Formate in Präsenz ergänzt, weil digitale Werkzeuge nicht ausschließlich mit digitalen Formaten begleitet werden sollten, ohne dass zwischenmenschliche Beziehungen verloren gehen.</span><span class="p-src">Feinkonzept 5.4.2 und 5.4.3 · analoge Ergänzung: Krutwage/Port</span></span>
+        <p>Aufzeichnungen einer Session bleiben Lektionen. Hier stehen nur die Termine.</p>
+      </div>
+      <h2 class="bereich-titel" id="live-dabei-titel">Teilgenommen</h2>
+      <p class="meta-line">Sessions, an denen Sie dabei waren.</p>
+      <div id="live-teilgenommen-liste"></div>
+      <p class="meta-line" id="live-teilgenommen-leer" hidden>Noch keine Teilnahme.</p>
+      <h2 class="bereich-titel" id="live-frei-titel">Verfügbare Live-Sessions</h2>
+      <p class="meta-line">Termine, an denen Sie noch nicht teilgenommen haben. Suche und Filter gelten nur für diese Liste.</p>
+      <div id="filter-slot-live"></div>
+      <div id="live-verfuegbar-liste"></div>
+      <p class="meta-line" id="live-verfuegbar-leer" hidden>Zurzeit keine weitere Session.</p>
+      <p class="meta-line" id="live-filter-leer" hidden>Keine Live-Session entspricht dieser Auswahl.</p>
+    </div>
+  </div>
+
+  <div id="view-lauf-begonnen" class="view" hidden>
+    <button type="button" class="backlink" data-view-jump="inhalte">← Lektionen</button>
+    <h1>Begonnene Lektionen</h1>
+    <p>Dieselben Kacheln wie bei den verfügbaren Lektionen.</p>
+    <div id="inhalte-begonnen" class="grid"></div>
+    <p class="meta-line" id="begonnen-leer" hidden>Noch keine begonnene Lektion. Eine verfügbare Lektion erscheint hier, sobald Sie sie öffnen.</p>
+  </div>
+  <div id="view-lauf-abgeschlossen" class="view" hidden>
+    <button type="button" class="backlink" data-view-jump="inhalte">← Lektionen</button>
+    <h1>Abgeschlossene Lektionen</h1>
+    <p>Dieselben Kacheln wie bei den verfügbaren Lektionen. Bei Bedarf markieren Sie eine Lektion wieder als begonnen.</p>
+    <div id="inhalte-abgeschlossen" class="grid"></div>
+    <p class="meta-line" id="abgeschlossen-leer" hidden>Noch keine abgeschlossene Lektion.</p>
+  </div>
+  <div id="view-impuls-begonnen" class="view" hidden>
+    <button type="button" class="backlink" data-view-jump="impulse">← Impulse</button>
+    <h1>Begonnene Impulse</h1>
+    <p>Dieselben Kacheln wie bei den Lektionen.</p>
+    <div id="impulse-begonnen" class="grid"></div>
+    <p class="meta-line" id="impuls-begonnen-leer" hidden>Noch kein begonnener Impuls.</p>
+  </div>
+  <div id="view-impuls-abgeschlossen" class="view" hidden>
+    <button type="button" class="backlink" data-view-jump="impulse">← Impulse</button>
+    <h1>Abgeschlossene Impulse</h1>
+    <p>Dieselben Kacheln wie bei den Lektionen.</p>
+    <div id="impulse-abgeschlossen" class="grid"></div>
+    <p class="meta-line" id="impuls-abgeschlossen-leer" hidden>Noch kein abgeschlossener Impuls.</p>
+  </div>
+
+  <div id="view-faq" class="view" hidden>
+    <button type="button" class="backlink" data-view-jump="home">← Startseite</button>
+  <section id="faq" class="faq-seite">
+    <h1>Häufige Fragen</h1>
+    <p>Der schnellste Weg zu einer verlässlichen Antwort. An jedem Eintrag steht, wann er geprüft wurde.</p>
+    <div class="faq-list">
+
+      <div class="faq-item open" data-faq="start" data-geprueft="12.08.2026">
+        <button class="faq-q" aria-expanded="true">
+          Brauche ich Vorwissen, um hier zu starten?
+          <span class="plus" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
+        <div class="faq-a">
+          <p>Nein. Die Basis-Inhalte setzen kein Vorwissen voraus und erklären alles von Grund auf. Wer bereits Erfahrung mitbringt, steigt direkt in die Aufbau-, Spezial- oder Profi-Inhalte ein.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" data-faq="erlaubnis" data-geprueft="02.10.2026" data-gegen="fachlich gegengezeichnet">
+        <button class="faq-q" aria-expanded="false">
+          Welches Werkzeug darf ich wofür nutzen?
+          <span class="plus" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
+        <div class="faq-a">
+          <p>Orientierend: Nutzen Sie nur Werkzeuge, die Ihre Behörde für den konkreten Zweck freigegeben hat. Dieser Eintrag ersetzt die Regelung nicht. Maßgeblich bleibt die für das Werkzeug benannte Dienstanweisung. Die Antwort ist von der fachlich zuständigen Stelle gegengezeichnet.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" data-faq="reduziert" data-geprueft="20.10.2026" data-gegen="Gegenzeichnung offen, reduzierte Verweisform">
+        <button class="faq-q" aria-expanded="false">
+          Darf ich einen Vorgang in ein frei verfügbares Sprachmodell geben?
+          <span class="plus" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
+        <div class="faq-a">
+          <p>Für diese Frage liegt noch keine gegengezeichnete Antwort vor. Bis dahin gilt nur der Verweis: Maßgeblich ist die für das Werkzeug benannte Regelung Ihrer Behörde. Eine orientierende Antwort steht hier bewusst nicht.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Ersetzt die KI-Werkstatt die bisherige Fortbildung?
+          <span class="plus" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
+        <div class="faq-a">
+          <p>Nein. Die Werkstatt ergänzt die bestehenden Fortbildungsformate um eine jederzeit verfügbare Lern- und Wissensumgebung. Formale Fortbildungen finden weiterhin wie gewohnt statt.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Wie finde ich Inhalte zu meinem Aufgabenbereich?
+          <span class="plus" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
+        <div class="faq-a">
+          <p>Über die Suche oder die Filter nach Thema, Format, Niveau und Zielgruppe. Jeder Inhalt ist entsprechend gekennzeichnet, sodass Sie in wenigen Klicks beim passenden Angebot sind.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Kann ich Fragen stellen, wenn ich nicht weiterkomme?
+          <span class="plus" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
+        <div class="faq-a">
+          <p>Ja, jederzeit — in der Community. Dort antworten Kolleginnen und Kollegen sowie gekennzeichnete Fachleute. Es gibt keine falschen Fragen: Der Austausch lebt davon, dass auch Grundsätzliches gefragt wird.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Muss ich Fachfrau oder Fachmann sein, um einen Impuls beizutragen?
+          <span class="plus" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
+        <div class="faq-a">
+          <p>Nein. Impulsgeberinnen und Impulsgeber berichten aus ihrer eigenen Praxis, nicht aus einer Expertenrolle heraus. Gerade der Bericht darüber, was nicht funktioniert hat, hilft anderen weiter. Die Redaktion unterstützt bei der Aufbereitung, sodass kein technischer Aufwand entsteht.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Wie aktuell sind die Inhalte?
+          <span class="plus" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
+        <div class="faq-a">
+          <p>Alle Inhalte werden redaktionell geprüft und laufend aktualisiert. Bei wesentlichen Änderungen — etwa neuen Systemen oder rechtlichen Entwicklungen — werden die betroffenen Inhalte überarbeitet und sichtbar gekennzeichnet.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  </div>
+
+  <div id="view-player" class="view" hidden></div>
+  <div id="view-summary" class="view" hidden></div>
+  <div id="view-glossar" class="view" hidden></div>
+  <div id="view-profil" class="view" hidden></div>
+  <div id="view-meine" class="view" hidden>
+    <button type="button" class="backlink" data-view-jump="home">← Startseite</button>
+    <h1>Meine Inhalte</h1>
+    <p class="meta-line">Nur Lektionen, Impulse und Live-Sessions, die Sie erstellt haben oder ausdrücklich bearbeiten dürfen. Begonnenes und Abgeschlossenes liegt auf der jeweiligen Seite.</p>
+    <section class="anlegen" aria-labelledby="anlegen-titel">
+      <h2 id="anlegen-titel">Inhalt erstellen</h2>
+      <p>Inhalt, Impuls oder Live-Session. Der Entwurf bleibt bei Ihnen, bis Sie ihn zur Freigabe geben. Ein Stift an der Kachel und in der Ansicht bedeutet: das können Sie bearbeiten.</p>
+      <div class="button-row">
+        <button type="button" class="btn-solid" data-action="neu" data-art="inhalt">Neuen Inhalt anlegen</button>
+        <button type="button" class="btn-line" data-action="neu" data-art="impuls">Neuen Impuls erstellen</button>
+        <button type="button" class="btn-line" data-action="neu" data-art="live">Neue Live-Session starten</button>
+        <button type="button" class="btn-line" data-view-jump="leitfaden">Leitfaden öffnen</button>
+      </div>
+    </section>
+    <div id="inhalte-eigene" class="grid"></div>
+    <h2 id="eigene-impulse-titel">Eigene Impulse</h2>
+    <p class="meta-line">Ihre Praxisbeiträge. Unter Impulse stehen nur die veröffentlichten Beiträge, die nicht Ihnen gehören.</p>
+    <div id="impulse-eigene" class="grid"></div>
+    <h2 id="eigene-live-titel">Eigene Live-Sessions</h2>
+    <p class="meta-line">Termine, die Sie anlegen. Verfügbare Termine und Ihre Teilnahmen stehen unter Live-Sessions.</p>
+    <div id="live-eigene" class="grid"></div>
+  </div>
+  <div id="view-editor" class="view" hidden></div>
+  <div id="view-leitfaden" class="view" hidden>
+    <button type="button" class="backlink" data-view-jump="meine">← Meine Inhalte</button>
+    <p class="eyebrow">Rahmen für neue Inhalte</p>
+    <h1>Leitfaden</h1>
+    <p>Der Anforderungskatalog nennt einen Leitfaden mit acht Ausschlusskriterien. Die ausformulierte Liste liegt nicht im MVP-Entwurf. Der Prototyp sperrt die Freigabe an den Merkmalen, die Katalog und Journeys für den Start benennen.</p>
+    <ol class="steps">
+      <li><h3>Genau eine Niveaustufe</h3><p>Basis, Aufbau, Spezial oder Profi. In der Einordnungshilfe entsprechen die ersten drei Anfänger, Fortgeschritten und Experte; Profi richtet sich an Menschen, die KI-Lösungen selbst entwickeln, betreuen oder vermitteln. Die Stufe beschreibt den Inhalt, nicht die Person. Keine Einstufung, keine Zugangssperre, keine Pflichtreihenfolge.</p></li>
+      <li><h3>Anwendungsfeld</h3><p>Ermittlung, Führung oder Verwaltung, auch mehrere. Unbesetzte Felder bleiben in der Übersicht als Lücke sichtbar und werden nicht mit Fremdinhalt gefüllt.</p></li>
+      <li><h3>Art und Thema</h3><p>Jeder Inhalt ist genau eine Art: Basismodul, Anwendungsmodul, Beitrag, Praxisimpuls oder FAQ-Eintrag. Dazu gehört ein Thema. Ein KI-Tool und eine Lernaktivität (H5P oder Video als iFrame) sind freiwillig.</p></li>
+        <li><h3>Fehlversuch ohne Abwertung</h3><p>Wo ein typischer Fehlversuch gezeigt wird, ist er normal und hat einen Korrekturhinweis. Keine Drohkulisse, keine Abwertung bisheriger Arbeitsweisen.</p></li>
+      <li><h3>Passendes Format</h3><p>Begriffe und Regeln als strukturierter Text. Bedienabläufe als bebilderte Schrittfolge oder als Bildschirmaufzeichnung mit Bordmitteln. Ohne Termin, Begleitung oder Beschaffung.</p></li>
+      <li><h3>Fassungsstand</h3><p>Das Prüfdatum setzt die Redaktion bei der Freigabe. Frühere Fassungen bleiben benannt.</p></li>
+    </ol>
+    <div class="form-card">
+      <h2>Grundlagenkanon</h2>
+      <p>Fünf bis sieben Module mit Lernziel, Geltungsbereich und Fassungsstand. Im Prototyp sichtbar: Wie Sprachmodelle Texte erzeugen, Halluzinationen erkennen, Was nicht in das Werkzeug gehört, Ergebnisse prüfen, Wo KI an Grenzen stößt. Dazu die Einordnung von Artikel 4 als Wissensartikel. Ein Zertifikat darüber läuft später über Moodle.</p>
+    </div>
+  </div>
+  <div id="view-redaktion" class="view" hidden></div>
+  <div id="view-mod-freigabe" class="view" hidden></div>
+  <div id="view-mod-kommentare" class="view" hidden></div>
+  <div id="view-mod-pruefung" class="view" hidden></div>
+  <div id="view-review" class="view" hidden></div>
+  <div id="view-statistik" class="view" hidden></div>
+  <div id="view-admin" class="view" hidden></div>
+
+</div>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span>KI-Werkstatt Polizei NRW · Landesamt für Ausbildung, Fortbildung und Personalangelegenheiten</span>
+    <span class="disclaimer">Konzeptvisualisierung zur Veranschaulichung der Funktionslogik — keine finale Gestaltung. MVP-Umfang nach Entwurf; die spätere Ausbaustufe ist gekennzeichnet und nicht ausführbar.</span>
+  </div>
+</footer>
+
+<div id="dialog" class="modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+    <h2 id="dialog-title"></h2>
+    <div id="dialog-body"></div>
+    <div class="modal-actions" id="dialog-actions"></div>
+    <button type="button" class="textbtn" id="dialog-close">Schließen</button>
+  </div>
+</div>
+<div id="toast" class="toast" hidden role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
